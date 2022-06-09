@@ -150,25 +150,25 @@ jobs:
           message: ${{ env.VERSION }}
           color: blue
 
-      - name: Upload Pacts
-        if:
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
-        run: |
-          set -ue ;
-          docker run --rm \
-           -w ${PWD} \
-           -v ${PWD}:${PWD} \
-           -e PACT_BROKER_BASE_URL=${{ secrets.PACT_BROKER_BASE_URL }} \
-           -e PACT_BROKER_USERNAME=${{ secrets.PACT_BROKER_USERNAME }} \
-           -e PACT_BROKER_PASSWORD=${{ secrets.PACT_BROKER_PASSWORD }} \
-            pactfoundation/pact-cli:0.50.0.27 \
-            publish \
-            ${PWD}/service/build/pacts \
-            --consumer-app-version "${GITHUB_SHA::7}" \
-            --tag-with-git-branch
+#      - name: Upload Pacts
+#        if:
+#          contains('
+#          refs/heads/main
+#          refs/heads/master
+#          ', github.ref)
+#        run: |
+#          set -ue ;
+#          docker run --rm \
+#           -w ${PWD} \
+#           -v ${PWD}:${PWD} \
+#           -e PACT_BROKER_BASE_URL=${{ secrets.PACT_BROKER_BASE_URL }} \
+#           -e PACT_BROKER_USERNAME=${{ secrets.PACT_BROKER_USERNAME }} \
+#           -e PACT_BROKER_PASSWORD=${{ secrets.PACT_BROKER_PASSWORD }} \
+#            pactfoundation/pact-cli:0.50.0.27 \
+#            publish \
+#            ${PWD}/service/build/pacts \
+#            --consumer-app-version "${GITHUB_SHA::7}" \
+#            --tag-with-git-branch
 
       - name: Upload build results
         uses: actions/upload-artifact@v2
