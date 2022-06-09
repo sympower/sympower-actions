@@ -85,22 +85,6 @@ jobs:
           message: ${{ env.VERSION }}
           color: orange
 
-### Uncomment once Pact Broker is installed : https://sympower.atlassian.net/browse/TECH-202
-#      - name: Upload Pacts
-#        run: |
-#          set -ue ;
-#          docker run --rm \
-#           -w ${PWD} \
-#           -v ${PWD}:${PWD} \
-#           -e PACT_BROKER_BASE_URL=${{ secrets.PACT_BROKER_BASE_URL }} \
-#           -e PACT_BROKER_USERNAME=${{ secrets.PACT_BROKER_USERNAME }} \
-#           -e PACT_BROKER_PASSWORD=${{ secrets.PACT_BROKER_PASSWORD }} \
-#            pactfoundation/pact-cli:latest \
-#            publish \
-#            ${PWD}/service/build/pacts \
-#            --consumer-app-version "${GITHUB_SHA::7}" \
-#            --tag-with-git-branch :
-
       - name: Upload build results
         uses: actions/upload-artifact@v2
         if: always()
