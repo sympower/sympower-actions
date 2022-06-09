@@ -164,16 +164,18 @@ jobs:
           ', github.ref)
         run: |
           set -ue ;
-          docker run --rm \
-           -w ${PWD} \
-           -v ${PWD}:${PWD} \
-           -e PACT_BROKER_BASE_URL=${{ secrets.PACT_BROKER_BASE_URL }} \
-           -e PACT_BROKER_USERNAME=${{ secrets.PACT_BROKER_USERNAME }} \
-           -e PACT_BROKER_PASSWORD=${{ secrets.PACT_BROKER_PASSWORD }} \
-            pactfoundation/pact-cli:0.50.0.27 \
-            publish \
-            ${PWD}/service/build/pacts \
-            --consumer-app-version "${{ env.VERSION }}"
+          for PACT_DIR in $( find . | grep build/pacts$ | sed 's/^.\///' ) ; do
+            docker run --rm \
+             -w ${PWD} \
+             -v ${PWD}:${PWD} \
+             -e PACT_BROKER_BASE_URL=${{ secrets.PACT_BROKER_BASE_URL }} \
+             -e PACT_BROKER_USERNAME=${{ secrets.PACT_BROKER_USERNAME }} \
+             -e PACT_BROKER_PASSWORD=${{ secrets.PACT_BROKER_PASSWORD }} \
+              pactfoundation/pact-cli:0.50.0.27 \
+              publish \
+              ${PWD}/${PACT_DIR} \
+              --consumer-app-version "${{ env.VERSION }}"
+          done
 
       - name: Upload build results
         uses: actions/upload-artifact@v2
