@@ -165,6 +165,7 @@ jobs:
         run: |
           set -ue ;
           for PACT_DIR in $( find . | grep build/pacts$ | sed 's/^.\///' ) ; do
+            echo "Uploading pacts in: ${PACT_DIR}"
             docker run --rm \
              -w ${PWD} \
              -v ${PWD}:${PWD} \
