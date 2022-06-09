@@ -32,6 +32,12 @@ on:
         required: true
       DOCKER_REGISTRY_HOST:
         required: true
+      PACT_BROKER_BASE_URL:
+        required: true
+      PACT_BROKER_USERNAME:
+        required: true
+      PACT_BROKER_PASSWORD:
+        required: true
 
 jobs:
   build:
@@ -167,7 +173,7 @@ jobs:
             pactfoundation/pact-cli:0.50.0.27 \
             publish \
             ${PWD}/service/build/pacts \
-            --consumer-app-version "${GITHUB_SHA::7}"
+            --consumer-app-version "${{ env.VERSION }}"
 
       - name: Upload build results
         uses: actions/upload-artifact@v2
