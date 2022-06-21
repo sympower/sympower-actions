@@ -55,7 +55,7 @@ jobs:
       - name: Set env
         run: |
           set -ue ;
-          currentDate=$(date +"%Y%m%d%H%M") ;
+          currentDate=$(date +"%Y.%m.%d.%H.%M") ;
           tag=$(echo $GITHUB_SHA | cut -c 1-7) ;
           echo "VERSION=$(echo $currentDate-$tag)" >> $GITHUB_ENV ;
           echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
