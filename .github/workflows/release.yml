@@ -1,4 +1,4 @@
-name: Release new version to Nexus using Gradle
+name: Release new schema version to Nexus
 
 on:
   workflow_call:
