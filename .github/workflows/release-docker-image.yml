@@ -93,6 +93,25 @@ jobs:
               docker push "${FULL_DOCKER_IMAGE_NAME}" ;
           done
 
+      - name: Check for changes in schema
+        id: files
+        uses: tj-actions/changed-files@v35
+        with:
+          since_last_remote_commit: "true"
+          files: schema/**
+
+      - name: Upload schema
+        if: steps.files.outputs.any_changed == 'true'
+        run: |
+          set -ue ;
+          ./gradlew publish --parallel --continue --stacktrace \
+            -PsympowerMavenRepoPublicUrl=${{ secrets.MAVEN_REPO_PUBLIC_URL }} \
+            -PsympowerMavenRepoSnapshotsUrl=${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }} \
+            -PsympowerMavenRepoReleasesUrl=${{ secrets.MAVEN_REPO_RELEASES_URL }} \
+            -PsympowerMavenRepoUsername=${{ secrets.MAVEN_REPO_USER }} \
+            -PsympowerMavenRepoPassword=${{ secrets.MAVEN_REPO_PASS }} \
+            -Ptag="${{ env.VERSION }}" ;
+
       - name: Upload build results
         uses: actions/upload-artifact@v3
         if: always()

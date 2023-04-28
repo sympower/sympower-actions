@@ -156,6 +156,51 @@ jobs:
           message: ${{ env.VERSION }}
           color: blue
 
+      - name: Check for changes in schema
+        if:
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
+        id: schema-files
+        uses: tj-actions/changed-files@v35
+        with:
+          since_last_remote_commit: "true"
+          files: schema/**
+
+      - name: Upload schema
+        if:
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
+          && steps.schema-files.outputs.any_changed == 'true'
+        run: |
+          set -ue ;
+          ./gradlew publish --parallel --continue --stacktrace \
+            -PsympowerMavenRepoPublicUrl=${{ secrets.MAVEN_REPO_PUBLIC_URL }} \
+            -PsympowerMavenRepoSnapshotsUrl=${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }} \
+            -PsympowerMavenRepoReleasesUrl=${{ secrets.MAVEN_REPO_RELEASES_URL }} \
+            -PsympowerMavenRepoUsername=${{ secrets.MAVEN_REPO_USER }} \
+            -PsympowerMavenRepoPassword=${{ secrets.MAVEN_REPO_PASS }} \
+            -Ptag="${{ env.VERSION }}" ;
+
+      - name: Update Schema Version Badge
+        if:
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
+          && steps.schema-files.outputs.any_changed == 'true'
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ inputs.gistID }}
+          filename: ${{ env.REPOSITORY_NAME }}-schema.json
+          label: Schema Version
+          message: ${{ env.VERSION }}
+          color: orange
+
       - name: Upload Pacts
         if:
           contains('
