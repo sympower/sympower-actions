@@ -5,10 +5,7 @@ name: Release new version
 on:
   workflow_call:
     inputs:
-      serviceGistID:
-        required: true
-        type: string
-      schemaGistID:
+      gistID:
         required: true
         type: string
     secrets:
@@ -148,7 +145,7 @@ jobs:
         uses: schneegans/dynamic-badges-action@v1.6.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
-          gistID: ${{ inputs.serviceGistID }}
+          gistID: ${{ inputs.gistID }}
           filename: ${{ env.REPOSITORY_NAME }}-service.json
           label: Service Version
           message: ${{ env.VERSION }}
@@ -193,7 +190,7 @@ jobs:
         uses: schneegans/dynamic-badges-action@v1.6.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
-          gistID: ${{ inputs.schemaGistID }}
+          gistID: ${{ inputs.gistID }}
           filename: ${{ env.REPOSITORY_NAME }}-schema.json
           label: Schema Version
           message: ${{ env.VERSION }}
