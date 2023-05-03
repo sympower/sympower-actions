@@ -1,6 +1,6 @@
 #Release new docker image to ECR and schema to Nexus (if contains any changes)
 
-name: Release
+name: Release new version
 
 on:
   workflow_call:
