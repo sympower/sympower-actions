@@ -94,14 +94,25 @@ jobs:
           echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
         shell: bash
 
+      - name: Check if schema exists
+        run: |
+          if [ -d "/schema" ]; then
+            echo "Directory exists"
+            echo "HAS_SCHEMA=true" >> $GITHUB_ENV ;
+          else
+            echo "Directory does not exist"
+            echo "HAS_SCHEMA=false" >> $GITHUB_ENV ;
+          fi
+
       - name: Check for changes in schema
         id: schema-files
+        if: HAS_SCHEMA == 'true'
         uses: tj-actions/changed-files@v35
         with:
           since_last_remote_commit: "true"
           files: schema/**
 
-      - name: Print schema changes value
-        run: |
-          set -ue ;
-          echo ${{ steps.schema-files.outputs.any_changed }}
+#      - name: Print schema changes value
+#        run: |
+#          set -ue ;
+#          echo ${{ steps.schema-files.outputs.any_changed }}
