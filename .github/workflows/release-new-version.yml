@@ -151,12 +151,26 @@ jobs:
           message: ${{ env.VERSION }}
           color: blue
 
+      - name: Check if schema exists
+        if:
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
+        run: |
+          if [ -d "/schema" ]; then
+            echo "HAS_SCHEMA=true" >> $GITHUB_ENV ;
+          else
+            echo "HAS_SCHEMA=false" >> $GITHUB_ENV ;
+          fi
+
       - name: Check for changes in schema
         if:
           contains('
           refs/heads/main
           refs/heads/master
           ', github.ref)
+          && env.HAS_SCHEMA == 'true'
         id: schema-files
         uses: tj-actions/changed-files@v35
         with:
@@ -169,6 +183,7 @@ jobs:
           refs/heads/main
           refs/heads/master
           ', github.ref)
+          && env.HAS_SCHEMA == 'true'
           && steps.schema-files.outputs.any_changed == 'true'
         run: |
           set -ue ;
@@ -186,6 +201,7 @@ jobs:
           refs/heads/main
           refs/heads/master
           ', github.ref)
+          && env.HAS_SCHEMA == 'true'
           && steps.schema-files.outputs.any_changed == 'true'
         uses: schneegans/dynamic-badges-action@v1.6.0
         with:
