@@ -112,7 +112,8 @@ jobs:
           since_last_remote_commit: "true"
           files: schema/**
 
-#      - name: Print schema changes value
-#        run: |
-#          set -ue ;
-#          echo ${{ steps.schema-files.outputs.any_changed }}
+      - name: Print schema changes value
+        if: env.HAS_SCHEMA == 'true' && steps.schema-files.outputs.any_changed
+        run: |
+          set -ue ;
+          echo ${{ steps.schema-files.outputs.any_changed }}
