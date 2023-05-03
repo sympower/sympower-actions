@@ -106,7 +106,7 @@ jobs:
 
       - name: Check for changes in schema
         id: schema-files
-        if: HAS_SCHEMA == 'true'
+        if: ${{ env.HAS_SCHEMA == 'true' }}
         uses: tj-actions/changed-files@v35
         with:
           since_last_remote_commit: "true"
