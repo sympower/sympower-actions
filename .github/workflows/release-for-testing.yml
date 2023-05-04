@@ -92,15 +92,26 @@ jobs:
               docker push "${FULL_DOCKER_IMAGE_NAME}" ;
           done
 
+      - name: Check if schema exists
+        run: |
+          if [ -d "/schema" ]; then
+            echo "HAS_SCHEMA=true" >> $GITHUB_ENV ;
+          else
+            echo "HAS_SCHEMA=false" >> $GITHUB_ENV ;
+          fi
+
       - name: Check for changes in schema
-        id: files
+        if: env.HAS_SCHEMA == 'true'
+        id: schema-files
         uses: tj-actions/changed-files@v35
         with:
           since_last_remote_commit: "true"
           files: schema/**
 
       - name: Upload schema
-        if: steps.files.outputs.any_changed == 'true'
+        if:
+          env.HAS_SCHEMA == 'true'
+          && steps.files.outputs.any_changed == 'true'
         run: |
           set -ue ;
           ./gradlew publish --parallel --continue --stacktrace \
