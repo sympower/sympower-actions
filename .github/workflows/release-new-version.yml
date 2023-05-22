@@ -158,7 +158,7 @@ jobs:
           refs/heads/master
           ', github.ref)
         run: |
-          if [ -d "/schema" ]; then
+          if [ -d "schema" ]; then
             echo "HAS_SCHEMA=true" >> $GITHUB_ENV ;
           else
             echo "HAS_SCHEMA=false" >> $GITHUB_ENV ;
