@@ -171,7 +171,6 @@ jobs:
           refs/heads/master
           ', github.ref)
           && env.HAS_SCHEMA == 'true'
-          env.HAS_SCHEMA == 'true'
         id: schema-files
         uses: tj-actions/changed-files@v35
         with:
