@@ -152,27 +152,25 @@ jobs:
           color: blue
 
       - name: Check if schema exists
-#        if:
-#          contains('
-#          refs/heads/main
-#          refs/heads/master
-#          ', github.ref)
+        if:
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
         run: |
           if [ -d "schema" ]; then
-            echo "SCHEMA FOUND"
             echo "HAS_SCHEMA=true" >> $GITHUB_ENV ;
           else
-            echo "SCHEMA NOT FOUND"
             echo "HAS_SCHEMA=false" >> $GITHUB_ENV ;
           fi
 
       - name: Check for changes in schema
         if:
-#          contains('
-#          refs/heads/main
-#          refs/heads/master
-#          ', github.ref)
-#          && env.HAS_SCHEMA == 'true'
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
+          && env.HAS_SCHEMA == 'true'
           env.HAS_SCHEMA == 'true'
         id: schema-files
         uses: tj-actions/changed-files@v35
