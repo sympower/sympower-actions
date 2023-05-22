@@ -1,4 +1,7 @@
-name: Release new docker image to ECR (use for testing ONLY)
+#Release new docker image to ECR as well as schema (if contains any changes) to Nexus (use for testing ONLY)
+
+name: Release for testing
+run_name: Release of ${{ github.ref_name }} by ${{ github.actor }}
 
 on:
   workflow_call:
@@ -29,15 +32,11 @@ jobs:
           # Disabling shallow clone is recommended for improving relevancy of reporting
           fetch-depth: 0
 
-      - name: Cache local gradle repository
-        uses: actions/cache@v3
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          gradle-home-cache-cleanup: true
+
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
         with:
@@ -92,6 +91,36 @@ jobs:
               source "${VERSION_FILE}" ;
               docker push "${FULL_DOCKER_IMAGE_NAME}" ;
           done
+
+      - name: Check if schema exists
+        run: |
+          if [ -d "/schema" ]; then
+            echo "HAS_SCHEMA=true" >> $GITHUB_ENV ;
+          else
+            echo "HAS_SCHEMA=false" >> $GITHUB_ENV ;
+          fi
+
+      - name: Check for changes in schema
+        if: env.HAS_SCHEMA == 'true'
+        id: schema-files
+        uses: tj-actions/changed-files@v35
+        with:
+          since_last_remote_commit: "true"
+          files: schema/**
+
+      - name: Upload schema
+        if:
+          env.HAS_SCHEMA == 'true'
+          && steps.files.outputs.any_changed == 'true'
+        run: |
+          set -ue ;
+          ./gradlew publish --parallel --continue --stacktrace \
+            -PsympowerMavenRepoPublicUrl=${{ secrets.MAVEN_REPO_PUBLIC_URL }} \
+            -PsympowerMavenRepoSnapshotsUrl=${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }} \
+            -PsympowerMavenRepoReleasesUrl=${{ secrets.MAVEN_REPO_RELEASES_URL }} \
+            -PsympowerMavenRepoUsername=${{ secrets.MAVEN_REPO_USER }} \
+            -PsympowerMavenRepoPassword=${{ secrets.MAVEN_REPO_PASS }} \
+            -Ptag="${{ env.VERSION }}" ;
 
       - name: Upload build results
         uses: actions/upload-artifact@v3

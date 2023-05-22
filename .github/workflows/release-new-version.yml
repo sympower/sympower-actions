@@ -1,7 +1,6 @@
-# This workflow will build a Java project with Gradle
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+#Release new docker image to ECR and schema to Nexus (if contains any changes)
 
-name: Java CI with Gradle
+name: Release new version
 
 on:
   workflow_call:
@@ -48,15 +47,11 @@ jobs:
           # Disabling shallow clone is recommended for improving relevancy of reporting
           fetch-depth: 0
 
-      - name: Cache local gradle repository
-        uses: actions/cache@v3
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          gradle-home-cache-cleanup: true
+
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
         with:
@@ -79,7 +74,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           set -ue ;
-          ./gradlew build integrationTest sonarqube --parallel --continue --stacktrace \
+          ./gradlew build integrationTest sonar --parallel --continue --stacktrace \
             -PsympowerMavenRepoPublicUrl=${{ secrets.MAVEN_REPO_PUBLIC_URL }} \
             -PsympowerMavenRepoSnapshotsUrl=${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }} \
             -PsympowerMavenRepoReleasesUrl=${{ secrets.MAVEN_REPO_RELEASES_URL }} \
@@ -127,7 +122,7 @@ jobs:
             -PregistryHost=${{ secrets.DOCKER_REGISTRY_HOST }} \
             -Ptag="${{ env.VERSION }}" ;
 
-      - name: Push Docker Image to Registy
+      - name: Push Docker Image to Registry
         if:
           contains('
           refs/heads/main
@@ -155,6 +150,67 @@ jobs:
           label: Service Version
           message: ${{ env.VERSION }}
           color: blue
+
+      - name: Check if schema exists
+        if:
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
+        run: |
+          if [ -d "/schema" ]; then
+            echo "HAS_SCHEMA=true" >> $GITHUB_ENV ;
+          else
+            echo "HAS_SCHEMA=false" >> $GITHUB_ENV ;
+          fi
+
+      - name: Check for changes in schema
+        if:
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
+          && env.HAS_SCHEMA == 'true'
+        id: schema-files
+        uses: tj-actions/changed-files@v35
+        with:
+          since_last_remote_commit: "true"
+          files: schema/**
+
+      - name: Upload schema
+        if:
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
+          && env.HAS_SCHEMA == 'true'
+          && steps.schema-files.outputs.any_changed == 'true'
+        run: |
+          set -ue ;
+          ./gradlew publish --parallel --continue --stacktrace \
+            -PsympowerMavenRepoPublicUrl=${{ secrets.MAVEN_REPO_PUBLIC_URL }} \
+            -PsympowerMavenRepoSnapshotsUrl=${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }} \
+            -PsympowerMavenRepoReleasesUrl=${{ secrets.MAVEN_REPO_RELEASES_URL }} \
+            -PsympowerMavenRepoUsername=${{ secrets.MAVEN_REPO_USER }} \
+            -PsympowerMavenRepoPassword=${{ secrets.MAVEN_REPO_PASS }} \
+            -Ptag="${{ env.VERSION }}" ;
+
+      - name: Update Schema Version Badge
+        if:
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
+          && env.HAS_SCHEMA == 'true'
+          && steps.schema-files.outputs.any_changed == 'true'
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ inputs.gistID }}
+          filename: ${{ env.REPOSITORY_NAME }}-schema.json
+          label: Schema Version
+          message: ${{ env.VERSION }}
+          color: orange
 
       - name: Upload Pacts
         if:
