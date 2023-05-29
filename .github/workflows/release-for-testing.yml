@@ -1,7 +1,6 @@
 #Release new docker image to ECR as well as schema (if contains any changes) to Nexus (use for testing ONLY)
 
 name: Release for testing
-run-name: Release of ${{ github.ref_name }} by ${{ github.actor }}
 
 on:
   workflow_call:
