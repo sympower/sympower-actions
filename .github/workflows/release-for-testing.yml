@@ -75,11 +75,11 @@ jobs:
           set -ue ;
           ./gradlew jib --parallel --continue --stacktrace \
             -Djib.from.platforms=linux/amd64,linux/arm64 \
-            -PsympowerMavenRepoPublicUrl=${{ secrets.MAVEN_REPO_PUBLIC_URL }} \
-            -PsympowerMavenRepoSnapshotsUrl=${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }} \
-            -PsympowerMavenRepoReleasesUrl=${{ secrets.MAVEN_REPO_RELEASES_URL }} \
-            -PsympowerMavenRepoUsername=${{ secrets.MAVEN_REPO_USER }} \
-            -PsympowerMavenRepoPassword=${{ secrets.MAVEN_REPO_PASS }} \
+            -PsympowerMavenRepoPublicUrl="${{ secrets.MAVEN_REPO_PUBLIC_URL }}" \
+            -PsympowerMavenRepoSnapshotsUrl="${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }}" \
+            -PsympowerMavenRepoReleasesUrl="${{ secrets.MAVEN_REPO_RELEASES_URL }}" \
+            -PsympowerMavenRepoUsername="${{ secrets.MAVEN_REPO_USER }}" \
+            -PsympowerMavenRepoPassword="${{ secrets.MAVEN_REPO_PASS }}" \
             -PregistryHost="${{ secrets.DOCKER_REGISTRY_HOST }}" \
             -Ptag="${{ env.VERSION }}" ;
 
@@ -106,11 +106,11 @@ jobs:
         run: |
           set -ue ;
           ./gradlew publish --parallel --continue --stacktrace \
-            -PsympowerMavenRepoPublicUrl=${{ secrets.MAVEN_REPO_PUBLIC_URL }} \
-            -PsympowerMavenRepoSnapshotsUrl=${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }} \
-            -PsympowerMavenRepoReleasesUrl=${{ secrets.MAVEN_REPO_RELEASES_URL }} \
-            -PsympowerMavenRepoUsername=${{ secrets.MAVEN_REPO_USER }} \
-            -PsympowerMavenRepoPassword=${{ secrets.MAVEN_REPO_PASS }} \
+            -PsympowerMavenRepoPublicUrl="${{ secrets.MAVEN_REPO_PUBLIC_URL }}" \
+            -PsympowerMavenRepoSnapshotsUrl="${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }}" \
+            -PsympowerMavenRepoReleasesUrl="${{ secrets.MAVEN_REPO_RELEASES_URL }}" \
+            -PsympowerMavenRepoUsername="${{ secrets.MAVEN_REPO_USER }}" \
+            -PsympowerMavenRepoPassword="${{ secrets.MAVEN_REPO_PASS }}" \
             -Ptag="${{ env.VERSION }}" ;
 
       - name: Upload build results
