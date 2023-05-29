@@ -120,7 +120,7 @@ jobs:
             -PsympowerMavenRepoReleasesUrl=${{ secrets.MAVEN_REPO_RELEASES_URL }} \
             -PsympowerMavenRepoUsername=${{ secrets.MAVEN_REPO_USER }} \
             -PsympowerMavenRepoPassword=${{ secrets.MAVEN_REPO_PASS }} \
-            -PregistryHost=${{ secrets.DOCKER_REGISTRY_HOST }} \
+            -PregistryHost="${{ secrets.DOCKER_REGISTRY_HOST }}" \
             -Ptag="${{ env.VERSION }}" ;
 
       - name: Update Service Version Badge
