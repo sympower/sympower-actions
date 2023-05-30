@@ -1,7 +1,6 @@
 #Release new docker image to ECR as well as schema (if contains any changes) to Nexus (use for testing ONLY)
 
 name: Release for testing
-run_name: Release of ${{ github.ref_name }} by ${{ github.actor }}
 
 on:
   workflow_call:
@@ -74,23 +73,15 @@ jobs:
       - name: Build Docker Image
         run: |
           set -ue ;
-          ./gradlew bootBuildImage --parallel --continue --stacktrace \
-            -PsympowerMavenRepoPublicUrl=${{ secrets.MAVEN_REPO_PUBLIC_URL }} \
-            -PsympowerMavenRepoSnapshotsUrl=${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }} \
-            -PsympowerMavenRepoReleasesUrl=${{ secrets.MAVEN_REPO_RELEASES_URL }} \
-            -PsympowerMavenRepoUsername=${{ secrets.MAVEN_REPO_USER }} \
-            -PsympowerMavenRepoPassword=${{ secrets.MAVEN_REPO_PASS }} \
-            -PregistryHost=${{ secrets.DOCKER_REGISTRY_HOST }} \
+          ./gradlew jib --parallel --continue --stacktrace \
+            -Djib.from.platforms=linux/amd64,linux/arm64 \
+            -PsympowerMavenRepoPublicUrl="${{ secrets.MAVEN_REPO_PUBLIC_URL }}" \
+            -PsympowerMavenRepoSnapshotsUrl="${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }}" \
+            -PsympowerMavenRepoReleasesUrl="${{ secrets.MAVEN_REPO_RELEASES_URL }}" \
+            -PsympowerMavenRepoUsername="${{ secrets.MAVEN_REPO_USER }}" \
+            -PsympowerMavenRepoPassword="${{ secrets.MAVEN_REPO_PASS }}" \
+            -PregistryHost="${{ secrets.DOCKER_REGISTRY_HOST }}" \
             -Ptag="${{ env.VERSION }}" ;
-
-      - name: Push Docker Image to Registry
-        run: |
-          set -ue ;
-          for VERSION_FILE in $(find . | grep  .generated-build-info.env) ; do
-              echo "Pushing image from definition file: ${VERSION_FILE}"
-              source "${VERSION_FILE}" ;
-              docker push "${FULL_DOCKER_IMAGE_NAME}" ;
-          done
 
       - name: Check if schema exists
         run: |
@@ -115,11 +106,11 @@ jobs:
         run: |
           set -ue ;
           ./gradlew publish --parallel --continue --stacktrace \
-            -PsympowerMavenRepoPublicUrl=${{ secrets.MAVEN_REPO_PUBLIC_URL }} \
-            -PsympowerMavenRepoSnapshotsUrl=${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }} \
-            -PsympowerMavenRepoReleasesUrl=${{ secrets.MAVEN_REPO_RELEASES_URL }} \
-            -PsympowerMavenRepoUsername=${{ secrets.MAVEN_REPO_USER }} \
-            -PsympowerMavenRepoPassword=${{ secrets.MAVEN_REPO_PASS }} \
+            -PsympowerMavenRepoPublicUrl="${{ secrets.MAVEN_REPO_PUBLIC_URL }}" \
+            -PsympowerMavenRepoSnapshotsUrl="${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }}" \
+            -PsympowerMavenRepoReleasesUrl="${{ secrets.MAVEN_REPO_RELEASES_URL }}" \
+            -PsympowerMavenRepoUsername="${{ secrets.MAVEN_REPO_USER }}" \
+            -PsympowerMavenRepoPassword="${{ secrets.MAVEN_REPO_PASS }}" \
             -Ptag="${{ env.VERSION }}" ;
 
       - name: Upload build results
