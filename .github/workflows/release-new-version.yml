@@ -171,7 +171,7 @@ jobs:
           refs/heads/master
           ', github.ref)
           && env.HAS_SCHEMA == 'true'
-          && steps.schema-files.outputs.any_changed == 'true'
+          && steps.schema-files.outputs.any_modified == 'true'
         run: |
           set -ue ;
           ./gradlew publish --parallel --continue --stacktrace \
@@ -189,7 +189,7 @@ jobs:
           refs/heads/master
           ', github.ref)
           && env.HAS_SCHEMA == 'true'
-          && steps.schema-files.outputs.any_changed == 'true'
+          && steps.schema-files.outputs.any_modified == 'true'
         uses: schneegans/dynamic-badges-action@v1.6.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
