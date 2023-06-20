@@ -102,7 +102,7 @@ jobs:
       - name: Upload schema
         if:
           env.HAS_SCHEMA == 'true'
-          && steps.files.outputs.any_changed == 'true'
+          && steps.files.outputs.any_modified == 'true'
         run: |
           set -ue ;
           ./gradlew publish --parallel --continue --stacktrace \
