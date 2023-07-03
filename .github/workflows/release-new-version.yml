@@ -8,6 +8,10 @@ on:
       gistID:
         required: true
         type: string
+    outputs:
+      version:
+        description: Version number of the image released to ECR
+        value: ${{ jobs.build_and_publish.outputs.version }}
     secrets:
       GIT_TOKEN:
         required: true
@@ -41,6 +45,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ env.VERSION }}
     steps:
       - uses: actions/checkout@v3
         with:
