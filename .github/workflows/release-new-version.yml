@@ -11,7 +11,7 @@ on:
     outputs:
       version:
         description: Version number of the image released to ECR
-        value: ${{ jobs.build_and_publish.outputs.version }}
+        value: ${{ jobs.build.outputs.version }}
     secrets:
       GIT_TOKEN:
         required: true

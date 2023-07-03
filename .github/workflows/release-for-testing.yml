@@ -4,6 +4,10 @@ name: Release for testing
 
 on:
   workflow_call:
+    outputs:
+      version:
+        description: Version number of the image released to ECR
+        value: ${{ jobs.build.outputs.version }}
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -25,6 +29,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ env.VERSION }}
     steps:
       - uses: actions/checkout@v3
         with:
