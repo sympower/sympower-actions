@@ -61,7 +61,7 @@ jobs:
       - name: Set env
         run: |
           set -ue ;
-          tag=$(echo ${GITHUB_REF#refs/heads/} | cut -c 1-20) ;
+          tag=$(echo ${GITHUB_REF_NAME} | cut -c 1-20) ;
           echo "VERSION=$(echo $tag)" >> $GITHUB_ENV ;
         shell: bash
 
