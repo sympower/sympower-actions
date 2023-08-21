@@ -119,12 +119,12 @@ jobs:
             -PsympowerMavenRepoPassword="${{ secrets.MAVEN_REPO_PASS }}" \
             -Ptag="${{ env.VERSION }}" ;
 
-      - name: Upload build results
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: results
-          retention-days: 1
-          path: |
-            **/build/reports/**/*
-            **/build/libs/**/*
+#      - name: Upload build results
+#        uses: actions/upload-artifact@v3
+#        if: always()
+#        with:
+#          name: results
+#          retention-days: 1
+#          path: |
+#            **/build/reports/**/*
+#            **/build/libs/**/*
