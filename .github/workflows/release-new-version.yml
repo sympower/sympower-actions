@@ -286,7 +286,7 @@ jobs:
         
             echo "$DISPATCH_EVENT"
           
-            echo curl -H "Accept: application/vnd.github.everest-preview+json" \
+            curl -H "Accept: application/vnd.github.everest-preview+json" \
               -H "Authorization: token ${DEPLOYER_TOKEN}" \
               --request POST \
               --data "${BODY}" \
