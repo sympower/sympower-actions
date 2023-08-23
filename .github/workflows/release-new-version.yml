@@ -165,7 +165,7 @@ jobs:
           ', github.ref)
           && env.HAS_SCHEMA == 'true'
         id: schema-files
-        uses: tj-actions/changed-files@v37
+        uses: tj-actions/changed-files@v38
         with:
           since_last_remote_commit: "true"
           files: schema/**
