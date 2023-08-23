@@ -41,6 +41,11 @@ on:
         required: true
       PACT_BROKER_PASSWORD:
         required: true
+      AUTODEPLOYER_ID:
+        required: true
+      AUTODEPLOYER_KEY:
+        required: true
+
 
 jobs:
   build:
