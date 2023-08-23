@@ -292,6 +292,8 @@ jobs:
               --data "${BODY}" \
               https://api.github.com/repos/sympower/environments/dispatches
           
+            echo "Done: $DISPATCH_EVENT"
+          
           done    
 
 
