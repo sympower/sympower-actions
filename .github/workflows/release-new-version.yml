@@ -264,11 +264,11 @@ jobs:
             fi
             
             if [ -z "$COMPONENT" ] || [ "$COMPONENT" = "null" ] ; then
-            COMPONENT="$REPOSITORY_NAME"
+              COMPONENT="$REPOSITORY_NAME"
             fi
             
             if [ -z "$SERVICE" ]|| [ "$SERVICE" = "null" ] ; then
-            SERVICE="$REPOSITORY_NAME"
+              SERVICE="$REPOSITORY_NAME"
             fi
           
             DISPATCH_EVENT="$REPOSITORY_NAME calls update version to $VERSION for $COMPONENT/$SERVICE in $ENVIRONMENT"
