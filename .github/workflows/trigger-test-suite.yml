@@ -22,7 +22,9 @@ on:
         required: false
         type: string
     secrets:
-      TEST_TRIGGER_ACCESS_TOKEN:
+      TEST_TRIGGER_APP_ID:
+        required: true
+      TEST_TRIGGER_APP_KEY:
         required: true
 
 jobs:
@@ -30,6 +32,12 @@ jobs:
     name: Trigger test suite
     runs-on: ubuntu-latest
     steps:
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.TEST_TRIGGER_APP_ID }}
+          private_key: ${{ secrets.TEST_TRIGGER_APP_KEY }}
+
       - uses: convictional/trigger-workflow-and-wait@v1.6.5
         with:
           owner: sympower
@@ -41,5 +49,5 @@ jobs:
               "test-to-trigger": "${{ github.event.inputs.test-to-trigger }}", 
               "${{ github.event.inputs.service-name }}-version": "${{ github.event.inputs.service-version }}" 
             }
-          github_token: ${{ secrets.TEST_TRIGGER_ACCESS_TOKEN }}
+          github_token: ${{ steps.generate-token.outputs.token }}
           comment_downstream_url: ${{ github.event.inputs.comment-downstream-url }}
