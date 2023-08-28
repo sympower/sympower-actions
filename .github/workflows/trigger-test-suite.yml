@@ -46,8 +46,8 @@ jobs:
           workflow_file_name: remote-test-trigger.yml
           client_payload: >-
             { 
-              "test-to-trigger": "${{ github.event.inputs.test-to-trigger }}", 
-              "${{ github.event.inputs.service-name }}-version": "${{ github.event.inputs.service-version }}" 
+              "test-to-trigger": "${{ inputs.test-to-trigger }}", 
+              "${{ inputs.service-name }}-version": "${{ inputs.service-version }}" 
             }
           github_token: ${{ steps.generate-token.outputs.token }}
           comment_downstream_url: ${{ github.event.inputs.comment-downstream-url }}
