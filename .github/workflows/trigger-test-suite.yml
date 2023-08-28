@@ -1,0 +1,45 @@
+#Release new docker image to ECR as well as schema (if contains any changes) to Nexus (use for testing ONLY)
+
+name: Trigger test suite
+
+on:
+  workflow_call:
+    inputs:
+      test-to-trigger:
+        description: 'Which test to trigger, e.g., system-activation'
+        type: string
+        required: true
+      service-name:
+        description: 'Name of the micro-service to run the test for'
+        type: string
+        required: true
+      service-version:
+        description: 'Version of the micro-service to run the test for'
+        type: string
+        required: true
+      comment-downstream-url:
+        description: 'Downstream url where to the trigger will add a comment with a link to the started workflow'
+        required: false
+        type: string
+    secrets:
+      TEST_TRIGGER_ACCESS_TOKEN:
+        required: true
+
+jobs:
+  trigger-test-suite:
+    name: Trigger test suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: convictional/trigger-workflow-and-wait@v1.6.5
+        with:
+          owner: sympower
+          repo: activating-flexibility-tests
+          ref: main
+          workflow_file_name: remote-test-trigger.yml
+          client_payload: >-
+            { 
+              "test-to-trigger": "${{ github.event.inputs.test-to-trigger }}", 
+              "${{ github.event.inputs.service-name }}-version": "${{ github.event.inputs.service-version }}" 
+            }
+          github_token: ${{ secrets.TEST_TRIGGER_ACCESS_TOKEN }}
+          comment_downstream_url: ${{ github.event.inputs.comment-downstream-url }}
