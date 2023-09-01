@@ -301,7 +301,7 @@ jobs:
         run: |
           set -ue ;
           zip reports.zip **/build/reports/**/* -r ;
-          zip libs.zip **/build/libs/**/* -r ;
+#          zip libs.zip **/build/libs/**/* -r ;
 
       - name: Upload build results
         uses: actions/upload-artifact@v3
