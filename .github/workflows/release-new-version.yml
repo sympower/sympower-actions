@@ -296,13 +296,16 @@ jobs:
           
           done    
 
+      - name: Zip artifacts
+        if: always()
+        run: |
+          set -ue ;
+          zip -r reports.zip **/build/reports/**/*
 
-#      - name: Upload build results
-#        uses: actions/upload-artifact@v3
-#        if: always()
-#        with:
-#          name: results
-#          retention-days: 1
-#          path: |
-#            **/build/reports/**/*
-#            **/build/libs/**/*
+      - name: Upload build results
+        uses: actions/upload-artifact@v3
+        with:
+          name: results
+          retention-days: 1
+          path: |
+            reports.zip
