@@ -300,8 +300,7 @@ jobs:
         if: always()
         run: |
           set -ue ;
-          zip reports.zip **/build/reports/**/* -r ;
-#          zip libs.zip **/build/libs/**/* -r ;
+          zip -r reports.zip **/build/reports/**/*
 
       - name: Upload build results
         uses: actions/upload-artifact@v3
@@ -310,4 +309,3 @@ jobs:
           retention-days: 1
           path: |
             reports.zip
-            libs.zip
