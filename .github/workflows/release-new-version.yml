@@ -300,7 +300,12 @@ jobs:
         if: always()
         run: |
           set -ue ;
-          zip -r reports.zip **/build/reports/**/*
+          if find . -type d -path "*/build/reports" -print -quit | grep -q .; then
+            echo "Directory exists, running zip command..."
+            zip -r reports.zip **/build/reports/**/*
+          else
+            echo "Directory does not exist, skipping zip command..."
+          fi
 
       - name: Upload build results
         uses: actions/upload-artifact@v3
