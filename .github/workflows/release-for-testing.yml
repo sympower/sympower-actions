@@ -120,6 +120,7 @@ jobs:
             -Ptag="${{ env.VERSION }}" ;
 
       - name: Zip artifacts
+        continue-on-error: true
         if: always()
         run: |
           set -ue ;
@@ -127,6 +128,7 @@ jobs:
 
       - name: Upload build results
         uses: actions/upload-artifact@v3
+        continue-on-error: true
         with:
           name: results
           retention-days: 1
