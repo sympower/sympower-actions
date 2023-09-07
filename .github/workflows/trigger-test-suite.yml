@@ -10,11 +10,11 @@ on:
         type: string
         required: true
       service-name:
-        description: 'Name of the micro-service to run the test for'
+        description: 'Name of the Docker image of the service to run the test for'
         type: string
         required: true
       service-version:
-        description: 'Version of the micro-service to run the test for'
+        description: 'Version of the Docker image of the service to run the test for'
         type: string
         required: true
       comment-downstream-url:
