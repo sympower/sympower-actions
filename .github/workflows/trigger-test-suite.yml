@@ -32,7 +32,7 @@ jobs:
     name: Trigger test suite
     runs-on: ubuntu-latest
     steps:
-      - uses: tibdex/github-app-token@v1
+      - uses: tibdex/github-app-token@v2
         id: generate-token
         with:
           app_id: ${{ secrets.TEST_TRIGGER_APP_ID }}
