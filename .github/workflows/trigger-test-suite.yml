@@ -29,7 +29,7 @@ on:
 
 jobs:
   trigger-test-suite:
-    name: Trigger test suite
+    name: Trigger ${{ inputs.test-to-trigger }}
     runs-on: ubuntu-latest
     steps:
       - uses: tibdex/github-app-token@v2
@@ -46,6 +46,7 @@ jobs:
           workflow_file_name: remote-test-trigger.yml
           client_payload: >-
             { 
+              "origin": "${{ inputs.service-name }}", 
               "test-to-trigger": "${{ inputs.test-to-trigger }}", 
               "${{ inputs.service-name }}-version": "${{ inputs.service-version }}" 
             }
