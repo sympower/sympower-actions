@@ -134,3 +134,21 @@ jobs:
           reporter: java-junit
           fail-on-error: false
           output-to: step-summary
+
+      - name: Create test reports
+        run: |
+          set -ue ;
+          ./gradlew testCodeCoverageReport behaviourTestCodeCoverageReport integrationTestCodeCoverageReport jacocoTestReport -x test -x behaviourTest -x integrationTest --parallel --continue --stacktrace \
+            -PsympowerMavenRepoPublicUrl="${{ secrets.MAVEN_REPO_PUBLIC_URL }}" \
+            -PsympowerMavenRepoSnapshotsUrl="${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }}" \
+            -PsympowerMavenRepoReleasesUrl="${{ secrets.MAVEN_REPO_RELEASES_URL }}" \
+            -PsympowerMavenRepoUsername="${{ secrets.MAVEN_REPO_USER }}" \
+            -PsympowerMavenRepoPassword="${{ secrets.MAVEN_REPO_PASS }}" \
+            -Ppactbroker.url="${{ secrets.PACT_BROKER_BASE_URL }}" \
+            -Ppactbroker.auth.username="${{ secrets.PACT_BROKER_USERNAME }}" \
+            -Ppactbroker.auth.password="${{ secrets.PACT_BROKER_PASSWORD }}" ;
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: testReports
+          path: service/build/reports/jacoco/

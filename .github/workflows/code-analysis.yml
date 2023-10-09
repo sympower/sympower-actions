@@ -1,0 +1,70 @@
+name: Code analysis
+
+on:
+  workflow_call:
+    secrets:
+      GIT_TOKEN:
+        required: true
+      SONAR_TOKEN:
+        required: true
+      MAVEN_REPO_PUBLIC_URL:
+        required: true
+      MAVEN_REPO_SNAPSHOTS_URL:
+        required: true
+      MAVEN_REPO_RELEASES_URL:
+        required: true
+      MAVEN_REPO_USER:
+        required: true
+      MAVEN_REPO_PASS:
+        required: true
+
+jobs:
+  sonar-cloud:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ env.VERSION }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Disabling shallow clone is recommended for improving relevancy of reporting
+          fetch-depth: 0
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-home-cache-cleanup: true
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: testReports
+          path: service/build/reports/jacoco/
+
+      - name: Sonar analysis
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          set -ue ;
+          ./gradlew sonar -x test -x behaviourTest -x integrationTest -x jacocoTestReport --parallel --continue --stacktrace \
+            -PsympowerMavenRepoPublicUrl="${{ secrets.MAVEN_REPO_PUBLIC_URL }}" \
+            -PsympowerMavenRepoSnapshotsUrl="${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }}" \
+            -PsympowerMavenRepoReleasesUrl="${{ secrets.MAVEN_REPO_RELEASES_URL }}" \
+            -PsympowerMavenRepoUsername="${{ secrets.MAVEN_REPO_USER }}" \
+            -PsympowerMavenRepoPassword="${{ secrets.MAVEN_REPO_PASS }}" \
+            -Ptag="${GITHUB_SHA::7}" ;
