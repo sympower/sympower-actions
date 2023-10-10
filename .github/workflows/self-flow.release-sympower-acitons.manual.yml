@@ -1,0 +1,29 @@
+name: Release new version
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set env
+        shell: bash
+        run: |
+          set -ue ;
+          currentDate=$(date +"%Y.%m.%d.%H.%M") ;
+          tag=$(echo $GITHUB_SHA | cut -c 1-7) ;
+          echo "VERSION=$(echo v$currentDate-$tag)" >> $GITHUB_ENV ;
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
