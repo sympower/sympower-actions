@@ -148,7 +148,7 @@ jobs:
             -Ppactbroker.auth.username="${{ secrets.PACT_BROKER_USERNAME }}" \
             -Ppactbroker.auth.password="${{ secrets.PACT_BROKER_PASSWORD }}" ;
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: testReports
           path: service/build/reports/jacoco/
