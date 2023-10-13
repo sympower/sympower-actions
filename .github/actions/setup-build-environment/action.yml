@@ -69,7 +69,7 @@ runs:
         
         echo sympowerMavenRepoPublicUrl=${{ inputs.maven-repo-public-url }} >> "$CONF_FILE"
         echo sympowerMavenRepoSnapshotsUrl=${{ inputs.maven-repo-snapshots-url }} >> "$CONF_FILE"
-        echo sympowerMavenRepoReleasesUrl={{ inputs.maven-repo-releases-url }} >> "$CONF_FILE"
+        echo sympowerMavenRepoReleasesUrl=${{ inputs.maven-repo-releases-url }} >> "$CONF_FILE"
   
         echo sympowerMavenRepoUsername=${{ inputs.maven-repo-user }} >> "$CONF_FILE"
         echo sympowerMavenRepoPassword=${{ inputs.maven-repo-pass }} >> "$CONF_FILE"
