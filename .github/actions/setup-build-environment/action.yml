@@ -52,10 +52,10 @@ runs:
         
         echo '# Gradle configuration' > "$CONF_FILE"
         
-        echo 'sympowerMavenRepoPublicUrl=${{ inputs.MAVEN_REPO_PUBLIC_URL }}' >> "$CONF_FILE"
-        echo 'sympowerMavenRepoSnapshotsUrl=${{ inputs.MAVEN_REPO_SNAPSHOTS_URL }}' >> "$CONF_FILE"
-        echo 'sympowerMavenRepoReleasesUrl={{ inputs.MAVEN_REPO_RELEASES_URL }}' >> "$CONF_FILE"
+        echo "sympowerMavenRepoPublicUrl=${{ inputs.MAVEN_REPO_PUBLIC_URL }}" >> "$CONF_FILE"
+        echo "sympowerMavenRepoSnapshotsUrl=${{ inputs.MAVEN_REPO_SNAPSHOTS_URL }}" >> "$CONF_FILE"
+        echo "sympowerMavenRepoReleasesUrl={{ inputs.MAVEN_REPO_RELEASES_URL }}" >> "$CONF_FILE"
   
-        echo 'sympowerMavenRepoUsername=${{ inputs.MAVEN_REPO_USER }}' >> "$CONF_FILE"
-        echo 'sympowerMavenRepoPassword=${{ inputs.MAVEN_REPO_PASS }}' >> "$CONF_FILE"
+        echo "sympowerMavenRepoUsername=${{ inputs.MAVEN_REPO_USER }}" >> "$CONF_FILE"
+        echo "sympowerMavenRepoPassword=${{ inputs.MAVEN_REPO_PASS }}" >> "$CONF_FILE"
 
