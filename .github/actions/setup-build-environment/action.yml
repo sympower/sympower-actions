@@ -1,34 +1,19 @@
 name: 'Setup Build Environment'
 description: 'Setup OpenJDK, Checkout, Login to AWS ECR'
 inputs:
-#  MAVEN_REPO_PUBLIC_URL:
-#    description: 'Maven dependency URL'
-#    required: true
-#  MAVEN_REPO_SNAPSHOTS_URL:
-#    description: 'Maven SNAPSHOT deployment URL'
-#    required: true
-#  MAVEN_REPO_RELEASES_URL:
-#    description: 'Maven RELEASE deployment URL'
-#    required: true
-#  MAVEN_REPO_USER:
-#    description: 'Maven repository username'
-#    required: true
-#  MAVEN_REPO_PASS:
-#    description: 'Maven repository password'
-#    required: true
-  maven-repo-public-url:
+  MAVEN_REPO_PUBLIC_URL:
     description: 'Maven dependency URL'
     required: true
-  maven-repo-snapshots-url:
+  MAVEN_REPO_SNAPSHOTS_URL:
     description: 'Maven SNAPSHOT deployment URL'
     required: true
-  maven-repo-releases-url:
+  MAVEN_REPO_RELEASES_URL:
     description: 'Maven RELEASE deployment URL'
     required: true
-  maven-repo-user:
+  MAVEN_REPO_USER:
     description: 'Maven repository username'
     required: true
-  maven-repo-pass:
+  MAVEN_REPO_PASS:
     description: 'Maven repository password'
     required: true
 runs:
@@ -67,10 +52,10 @@ runs:
         
         echo '# Gradle configuration' > "$CONF_FILE"
         
-        echo sympowerMavenRepoPublicUrl=${{ inputs.maven-repo-public-url }} >> "$CONF_FILE"
-        echo sympowerMavenRepoSnapshotsUrl=${{ inputs.maven-repo-snapshots-url }} >> "$CONF_FILE"
-        echo sympowerMavenRepoReleasesUrl=${{ inputs.maven-repo-releases-url }} >> "$CONF_FILE"
+        echo sympowerMavenRepoPublicUrl=${{ inputs.MAVEN_REPO_PUBLIC_URL }} >> "$CONF_FILE"
+        echo sympowerMavenRepoSnapshotsUrl=${{ inputs.MAVEN_REPO_SNAPSHOTS_URL }} >> "$CONF_FILE"
+        echo sympowerMavenRepoReleasesUrl=${{ inputs.MAVEN_REPO_RELEASES_URL }} >> "$CONF_FILE"
   
-        echo sympowerMavenRepoUsername=${{ inputs.maven-repo-user }} >> "$CONF_FILE"
-        echo sympowerMavenRepoPassword=${{ inputs.maven-repo-pass }} >> "$CONF_FILE"
+        echo sympowerMavenRepoUsername=${{ inputs.MAVEN_REPO_USER }} >> "$CONF_FILE"
+        echo sympowerMavenRepoPassword=${{ inputs.MAVEN_REPO_PASS }} >> "$CONF_FILE"
 
