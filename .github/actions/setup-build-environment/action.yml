@@ -1,21 +1,25 @@
 name: 'Setup Build Environment'
 description: 'Setup OpenJDK, Checkout, Login to AWS ECR'
 inputs:
-  MAVEN_REPO_PUBLIC_URL:
-    description: 'Maven dependency URL'
+  secrets:
+    description: 'Secrets required for the build'
     required: true
-  MAVEN_REPO_SNAPSHOTS_URL:
-    description: 'Maven SNAPSHOT deployment URL'
-    required: true
-  MAVEN_REPO_RELEASES_URL:
-    description: 'Maven RELEASE deployment URL'
-    required: true
-  MAVEN_REPO_USER:
-    description: 'Maven repository username'
-    required: true
-  MAVEN_REPO_PASS:
-    description: 'Maven repository password'
-    required: true
+    default: '{}'
+#  MAVEN_REPO_PUBLIC_URL:
+#    description: 'Maven dependency URL'
+#    required: true
+#  MAVEN_REPO_SNAPSHOTS_URL:
+#    description: 'Maven SNAPSHOT deployment URL'
+#    required: true
+#  MAVEN_REPO_RELEASES_URL:
+#    description: 'Maven RELEASE deployment URL'
+#    required: true
+#  MAVEN_REPO_USER:
+#    description: 'Maven repository username'
+#    required: true
+#  MAVEN_REPO_PASS:
+#    description: 'Maven repository password'
+#    required: true
 runs:
   using: "composite"
   steps:
@@ -52,10 +56,17 @@ runs:
         
         echo '# Gradle configuration' > "$CONF_FILE"
         
-        echo 'sympowerMavenRepoPublicUrl=${{ inputs.MAVEN_REPO_PUBLIC_URL }}' >> "$CONF_FILE"
-        echo 'sympowerMavenRepoSnapshotsUrl=${{ inputs.MAVEN_REPO_SNAPSHOTS_URL }}' >> "$CONF_FILE"
-        echo 'sympowerMavenRepoReleasesUrl=${{ inputs.MAVEN_REPO_RELEASES_URL }}' >> "$CONF_FILE"
+        echo 'sympowerMavenRepoPublicUrl=${{ fromJSON(inputs.secrets).MAVEN_REPO_PUBLIC_URL }}' >> "$CONF_FILE"
+        echo 'sympowerMavenRepoSnapshotsUrl=${{ fromJSON(inputs.secrets).MAVEN_REPO_SNAPSHOTS_URL }}' >> "$CONF_FILE"
+        echo 'sympowerMavenRepoReleasesUrl=${{ fromJSON(inputs.secrets).MAVEN_REPO_RELEASES_URL }}' >> "$CONF_FILE"
   
-        echo 'sympowerMavenRepoUsername=${{ inputs.MAVEN_REPO_USER }}' >> "$CONF_FILE"
-        echo 'sympowerMavenRepoPassword=${{ inputs.MAVEN_REPO_PASS }}' >> "$CONF_FILE"
+        echo 'sympowerMavenRepoUsername=${{ fromJSON(inputs.secrets).MAVEN_REPO_USER }}' >> "$CONF_FILE"
+        echo 'sympowerMavenRepoPassword=${{ fromJSON(inputs.secrets).MAVEN_REPO_PASS }}' >> "$CONF_FILE"
+
+#        echo 'sympowerMavenRepoPublicUrl=${{ inputs.MAVEN_REPO_PUBLIC_URL }}' >> "$CONF_FILE"
+#        echo 'sympowerMavenRepoSnapshotsUrl=${{ inputs.MAVEN_REPO_SNAPSHOTS_URL }}' >> "$CONF_FILE"
+#        echo 'sympowerMavenRepoReleasesUrl=${{ inputs.MAVEN_REPO_RELEASES_URL }}' >> "$CONF_FILE"
+#
+#        echo 'sympowerMavenRepoUsername=${{ inputs.MAVEN_REPO_USER }}' >> "$CONF_FILE"
+#        echo 'sympowerMavenRepoPassword=${{ inputs.MAVEN_REPO_PASS }}' >> "$CONF_FILE"
 
