@@ -1,0 +1,61 @@
+name: 'Run Tests'
+description: 'Run tests, behaviour tests and integration tests'
+inputs:
+  secrets:
+    description: 'Secrets required for the build'
+    required: true
+    default: '{}'
+runs:
+  using: "composite"
+  steps:
+    - name: Run unit tests
+      shell: bash
+      run: ./gradlew test --parallel --continue --stacktrace
+
+    - name: Unit test report
+      uses: phoenix-actions/test-reporting@v12
+      continue-on-error: true
+      env:
+        NODE_OPTIONS: --max-old-space-size=4096
+      with:
+        name: Unit test results
+        path: '**/test-results/test/*.xml'
+        reporter: java-junit
+        fail-on-error: false
+        output-to: step-summary
+
+    - name: Run behaviour tests
+      shell: test
+      run: ./gradlew behaviourTest --parallel --continue --stacktrace
+
+    - name: Behaviour test report
+      uses: phoenix-actions/test-reporting@v12
+      continue-on-error: true
+      env:
+        NODE_OPTIONS: --max-old-space-size=4096
+      with:
+        name: Behaviour test results
+        path: '**/test-results/behaviourTest/*.xml'
+        reporter: java-junit
+        fail-on-error: false
+        output-to: step-summary
+
+    - name: Run integration tests
+      shell: bash
+      run: ./gradlew integrationTest --parallel --continue --stacktrace
+
+    - name: Integration test report
+      uses: phoenix-actions/test-reporting@v12
+      continue-on-error: true
+      env:
+        NODE_OPTIONS: --max-old-space-size=4096
+      with:
+        name: Integration test results
+        path: '**/test-results/integrationTest/*.xml'
+        reporter: java-junit
+        fail-on-error: false
+        output-to: step-summary
+
+    - name: Create test reports
+      shell: bash
+      run: ./gradlew testCodeCoverageReport behaviourTestCodeCoverageReport integrationTestCodeCoverageReport jacocoTestReport -x test -x behaviourTest -x integrationTest --parallel --continue --stacktrace

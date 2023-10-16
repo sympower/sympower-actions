@@ -1,0 +1,32 @@
+name: 'Upload Pacts'
+description: 'Upload pacts to the pact broker'
+inputs:
+  secrets:
+    description: 'Secrets required for the build'
+    required: true
+    default: '{}'
+runs:
+  using: "composite"
+  steps:
+    - name: Upload Pacts
+      shell: bash
+      if:
+        contains('
+        refs/heads/main
+        refs/heads/master
+        ', github.ref)
+      run: |
+        set -ue ;
+        for PACT_DIR in $( find . | grep build/pacts$ | sed 's/^.\///' ) ; do
+          echo "Uploading pacts in: ${PACT_DIR}"
+          docker run --rm \
+           -w ${PWD} \
+           -v ${PWD}:${PWD} \
+           -e PACT_BROKER_BASE_URL=${{ fromJSON(inputs.secrets).PACT_BROKER_BASE_URL }} \
+           -e PACT_BROKER_USERNAME=${{ fromJSON(inputs.secrets).PACT_BROKER_USERNAME }} \
+           -e PACT_BROKER_PASSWORD=${{ fromJSON(inputs.secrets).PACT_BROKER_PASSWORD }} \
+            pactfoundation/pact-cli:0.50.0.27 \
+            publish \
+            ${PWD}/${PACT_DIR} \
+            --consumer-app-version "${{ env.VERSION }}"
+        done

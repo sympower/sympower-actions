@@ -1,0 +1,66 @@
+name: 'Upload Schema'
+description: 'If there are changes to schema, upload it to Nexus'
+inputs:
+  gistID:
+    description: 'ID of the gist to update'
+    required: true
+  secrets:
+    description: 'Secrets required for the build'
+    required: true
+    default: '{}'
+runs:
+  using: "composite"
+  steps:
+    - name: Check if schema exists
+      if:
+        contains('
+        refs/heads/main
+        refs/heads/master
+        ', github.ref)
+      run: |
+        if [ -d "schema" ]; then
+          echo "HAS_SCHEMA=true" >> $GITHUB_ENV ;
+        else
+          echo "HAS_SCHEMA=false" >> $GITHUB_ENV ;
+        fi
+
+    - name: Check for changes in schema
+      if:
+        contains('
+        refs/heads/main
+        refs/heads/master
+        ', github.ref)
+        && env.HAS_SCHEMA == 'true'
+      id: schema-files
+      uses: tj-actions/changed-files@v39
+      with:
+        since_last_remote_commit: "true"
+        files: schema/**
+
+    - name: Upload schema
+      bash: shell
+      if:
+        contains('
+        refs/heads/main
+        refs/heads/master
+        ', github.ref)
+        && env.HAS_SCHEMA == 'true'
+        && steps.schema-files.outputs.any_modified == 'true'
+      run: ./gradlew publish --parallel --continue --stacktrace
+
+    - name: Update Schema Version Badge
+      if:
+        contains('
+        refs/heads/main
+        refs/heads/master
+        ', github.ref)
+        && env.HAS_SCHEMA == 'true'
+        && steps.schema-files.outputs.any_modified == 'true'
+      uses: schneegans/dynamic-badges-action@v1.6.0
+      with:
+        auth: ${{ fromJSON(inputs.secrets).GIST_SECRET }}
+        gistID: ${{ inputs.gistID }}
+        filename: ${{ env.REPOSITORY_NAME }}-schema.json
+        label: Schema Version
+        message: ${{ env.VERSION }}
+        color: orange
