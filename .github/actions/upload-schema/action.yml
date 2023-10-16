@@ -12,6 +12,7 @@ runs:
   using: "composite"
   steps:
     - name: Check if schema exists
+      shell: bash
       if:
         contains('
         refs/heads/main
@@ -38,7 +39,7 @@ runs:
         files: schema/**
 
     - name: Upload schema
-      bash: shell
+      shell: bash
       if:
         contains('
         refs/heads/main
