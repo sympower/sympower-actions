@@ -1,0 +1,17 @@
+#Release new docker image to ECR and schema to Nexus (if contains any changes)
+
+name: Experiment
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: "Test composite actions"
+    steps:
+      - id: Setup build environment
+        uses: .github/actions/setup-build-environment@TECH-1140-split-workflow-into-composite-actions
+        with:
+          secrets: ${{ toJSON(secrets) }}
+      - run: ./gradlew assemble
