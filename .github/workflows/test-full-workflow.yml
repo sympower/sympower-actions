@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: "Test composite actions"
     steps:
-      - id: Setup build environment
+      - id: setup-build-environment
         uses: .github/actions/setup-build-environment@TECH-1140-split-workflow-into-composite-actions
         with:
           secrets: ${{ toJSON(secrets) }}
