@@ -45,7 +45,7 @@ jobs:
         uses: sympower/sympower-actions/.github/actions/docker-image@TECH-1140-split-workflow-into-composite-actions
         with:
           secrets: ${{ toJSON(secrets) }}
-          gistID: 3b87b5f98b49b6c5a7a697a99ea4987b
+          gistID: ${{ inputs.gistID }}
       - id: upload-schema
         name: "Upload schema"
         if:
@@ -56,7 +56,7 @@ jobs:
         uses: sympower/sympower-actions/.github/actions/upload-schema@TECH-1140-split-workflow-into-composite-actions
         with:
           secrets: ${{ toJSON(secrets) }}
-          gistID: 3b87b5f98b49b6c5a7a697a99ea4987b
+          gistID: ${{ inputs.gistID }}
       - id: upload-pacts
         name: "Upload pacts"
         if:
