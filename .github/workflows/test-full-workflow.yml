@@ -30,6 +30,11 @@ jobs:
         uses: sympower/sympower-actions/.github/actions/run-tests@TECH-1140-split-workflow-into-composite-actions
         with:
           secrets: ${{ toJSON(secrets) }}
+      - id: code-analysis
+        name: "Code analysis"
+        uses: sympower/sympower-actions/.github/actions/code-analyzis@TECH-1140-split-workflow-into-composite-actions
+        with:
+          secrets: ${{ toJSON(secrets) }}
       - id: docker-image
         name: "Build docker image"
         if:
