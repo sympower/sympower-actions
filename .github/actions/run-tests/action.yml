@@ -17,9 +17,9 @@ runs:
       shell: bash
       run: |
         if find . | grep test-results/test | grep -q xml$ ; then
-          echo "::set-output name=exists::true"
+          echo "exists=true" >> "$GITHUB_OUTPUT"
         else
-          echo "::set-output name=exists::false"
+          echo "exists=false" >> "$GITHUB_OUTPUT"
         fi
 
     - name: Unit test report
@@ -44,9 +44,9 @@ runs:
       shell: bash
       run: |
         if find . | grep test-results/behaviourTest | grep -q xml$ ; then
-          echo "::set-output name=exists::true"
+          echo "exists=true" >> "$GITHUB_OUTPUT"
         else
-          echo "::set-output name=exists::false"
+          echo "exists=false" >> "$GITHUB_OUTPUT"
         fi
 
     - name: Behaviour test report
@@ -71,9 +71,9 @@ runs:
       shell: bash
       run: |
         if find . | grep test-results/behaviourTest | grep -q xml$ ; then
-          echo "::set-output name=exists::true"
+          echo "exists=true" >> "$GITHUB_OUTPUT"
         else
-          echo "::set-output name=exists::false"
+          echo "exists=false" >> "$GITHUB_OUTPUT"
         fi
 
     - name: Integration test report
