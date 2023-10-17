@@ -13,11 +13,6 @@ runs:
   steps:
     - name: Check if schema exists
       shell: bash
-      if:
-        contains('
-        refs/heads/main
-        refs/heads/master
-        ', github.ref)
       run: |
         if [ -d "schema" ]; then
           echo "HAS_SCHEMA=true" >> $GITHUB_ENV ;
@@ -26,12 +21,7 @@ runs:
         fi
 
     - name: Check for changes in schema
-      if:
-        contains('
-        refs/heads/main
-        refs/heads/master
-        ', github.ref)
-        && env.HAS_SCHEMA == 'true'
+      if: env.HAS_SCHEMA == 'true'
       id: schema-files
       uses: tj-actions/changed-files@v39
       with:
@@ -41,21 +31,13 @@ runs:
     - name: Upload schema
       shell: bash
       if:
-        contains('
-        refs/heads/main
-        refs/heads/master
-        ', github.ref)
-        && env.HAS_SCHEMA == 'true'
+        env.HAS_SCHEMA == 'true'
         && steps.schema-files.outputs.any_modified == 'true'
       run: ./gradlew publish --parallel --continue --stacktrace
 
     - name: Update Schema Version Badge
       if:
-        contains('
-        refs/heads/main
-        refs/heads/master
-        ', github.ref)
-        && env.HAS_SCHEMA == 'true'
+        env.HAS_SCHEMA == 'true'
         && steps.schema-files.outputs.any_modified == 'true'
       uses: schneegans/dynamic-badges-action@v1.6.0
       with:

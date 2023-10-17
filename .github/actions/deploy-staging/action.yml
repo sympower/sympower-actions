@@ -10,11 +10,6 @@ runs:
   steps:
     - name: Upload Pacts
       shell: bash
-      if:
-        contains('
-        refs/heads/main
-        refs/heads/master
-        ', github.ref)
       run: |
         set -ue ;
         for PACT_DIR in $( find . | grep build/pacts$ | sed 's/^.\///' ) ; do

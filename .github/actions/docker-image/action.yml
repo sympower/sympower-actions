@@ -13,22 +13,12 @@ runs:
   steps:
     - name: Build Docker Image
       shell: bash
-      if:
-        contains('
-        refs/heads/main
-        refs/heads/master
-        ', github.ref)
       run: |
         set -ue ;
         ./gradlew jib --parallel --continue --stacktrace \
           -Djib.from.platforms=linux/amd64,linux/arm64 
 
     - name: Update Service Version Badge
-      if:
-        contains('
-        refs/heads/main
-        refs/heads/master
-        ', github.ref)
       uses: schneegans/dynamic-badges-action@v1.6.0
       with:
         auth: ${{ fromJSON(inputs.secrets).GIST_SECRET }}
