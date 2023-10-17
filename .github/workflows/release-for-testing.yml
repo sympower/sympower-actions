@@ -32,16 +32,6 @@ jobs:
         with:
           secrets: ${{ toJSON(secrets) }}
           gistID: 3b87b5f98b49b6c5a7a697a99ea4987b
-      - id: deploy-staging
-        name: "Deploy staging"
-        if:
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
-        uses: sympower/sympower-actions/.github/actions/deploy-staging@TECH-1140-split-workflow-into-composite-actions
-        with:
-          secrets: ${{ toJSON(secrets) }}
       - id: upload-build-artifacts
         name: "Upload build artifacts"
         uses: sympower/sympower-actions/.github/actions/upload-build-artifacts@TECH-1140-split-workflow-into-composite-actions

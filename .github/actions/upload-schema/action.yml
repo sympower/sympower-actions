@@ -37,7 +37,11 @@ runs:
 
     - name: Update Schema Version Badge
       if:
-        env.HAS_SCHEMA == 'true'
+        contains('
+        refs/heads/main
+        refs/heads/master
+        ', github.ref)
+        && env.HAS_SCHEMA == 'true'
         && steps.schema-files.outputs.any_modified == 'true'
       uses: schneegans/dynamic-badges-action@v1.6.0
       with:
