@@ -12,7 +12,18 @@ runs:
       shell: bash
       run: ./gradlew test --parallel --continue --stacktrace
 
+    - name: Check test XML files exist
+      id: search-test-results
+      shell: bash
+      run: |
+        if find . | grep test-results/test | grep -q xml$ ; then
+          echo "::set-output name=exists::true"
+        else
+          echo "::set-output name=exists::false"
+        fi
+
     - name: Unit test report
+      if: steps.search-test-results.outputs.exists == 'true'
       uses: phoenix-actions/test-reporting@v12
       continue-on-error: true
       env:
@@ -25,10 +36,21 @@ runs:
         output-to: step-summary
 
     - name: Run behaviour tests
-      shell: test
+      shell: bash
       run: ./gradlew behaviourTest --parallel --continue --stacktrace
 
+    - name: Check behaviourTest XML files exist
+      id: search-behaviourTest-results
+      shell: bash
+      run: |
+        if find . | grep test-results/behaviourTest | grep -q xml$ ; then
+          echo "::set-output name=exists::true"
+        else
+          echo "::set-output name=exists::false"
+        fi
+
     - name: Behaviour test report
+      if: steps.search-behaviourTest-results.outputs.exists == 'true'
       uses: phoenix-actions/test-reporting@v12
       continue-on-error: true
       env:
@@ -44,7 +66,18 @@ runs:
       shell: bash
       run: ./gradlew integrationTest --parallel --continue --stacktrace
 
+    - name: Check integrationTest XML files exist
+      id: search-integrationTest-results
+      shell: bash
+      run: |
+        if find . | grep test-results/behaviourTest | grep -q xml$ ; then
+          echo "::set-output name=exists::true"
+        else
+          echo "::set-output name=exists::false"
+        fi
+
     - name: Integration test report
+      if: steps.search-integrationTest-results.outputs.exists == 'true'
       uses: phoenix-actions/test-reporting@v12
       continue-on-error: true
       env:
