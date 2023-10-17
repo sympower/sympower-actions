@@ -31,10 +31,6 @@ runs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v2
-
     - name: Set env
       run: |
         set -ue ;
@@ -43,7 +39,6 @@ runs:
         echo "VERSION=$(echo $currentDate-$tag)" >> $GITHUB_ENV ;
         echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
       shell: bash
-
 
     - name: Set env for main/master branch
       if:
@@ -95,7 +90,7 @@ runs:
         
         echo "tag=$VERSION" >> "$CONF_FILE"
         echo 'registryHost=${{ fromJSON(inputs.secrets).DOCKER_REGISTRY_HOST }}' >> "$CONF_FILE"
-        
+
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1-node16
@@ -103,3 +98,7 @@ runs:
         aws-access-key-id: ${{ fromJSON(inputs.secrets).AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ fromJSON(inputs.secrets).AWS_SECRET_ACCESS_KEY }}
         aws-region: 'eu-central-1'
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
