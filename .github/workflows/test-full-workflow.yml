@@ -26,23 +26,43 @@ jobs:
           secrets: ${{ toJSON(secrets) }}
       - id: docker-image
         name: "Build docker image"
+        if:
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
         uses: sympower/sympower-actions/.github/actions/docker-image@TECH-1140-split-workflow-into-composite-actions
         with:
           secrets: ${{ toJSON(secrets) }}
-          gistID: ${{ inputs.gistID }}
+          gistID: 3b87b5f98b49b6c5a7a697a99ea4987b
       - id: upload-schema
         name: "Upload schema"
+        if:
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
         uses: sympower/sympower-actions/.github/actions/upload-schema@TECH-1140-split-workflow-into-composite-actions
         with:
           secrets: ${{ toJSON(secrets) }}
           gistID: 3b87b5f98b49b6c5a7a697a99ea4987b
       - id: upload-pacts
         name: "Upload pacts"
+        if:
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
         uses: sympower/sympower-actions/.github/actions/upload-pacts@TECH-1140-split-workflow-into-composite-actions
         with:
           secrets: ${{ toJSON(secrets) }}
       - id: deploy-staging
         name: "Deploy staging"
+        if:
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
         uses: sympower/sympower-actions/.github/actions/deploy-staging@TECH-1140-split-workflow-into-composite-actions
         with:
           secrets: ${{ toJSON(secrets) }}
