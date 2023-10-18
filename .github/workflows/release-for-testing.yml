@@ -34,6 +34,5 @@ jobs:
           gistID: "not-used"
       - id: upload-build-artifacts
         name: "Upload build artifacts"
+        if: always()
         uses: sympower/sympower-actions/.github/actions/upload-build-artifacts@TECH-1140-split-workflow-into-composite-actions
-        with:
-          secrets: ${{ toJSON(secrets) }}

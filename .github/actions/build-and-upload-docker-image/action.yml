@@ -1,5 +1,5 @@
-name: 'Build Docker Image'
-description: 'Build and upload Docker image to ECR'
+name: 'Build and upload Docker Image'
+description: 'Build and upload Docker Image to ECR'
 inputs:
   gistID:
     description: 'ID of the gist to update'

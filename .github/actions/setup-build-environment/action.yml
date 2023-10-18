@@ -56,10 +56,10 @@ runs:
 
     - name: Set env for non-main/master
       if:
-        contains('
+        ${{ ! contains('
         refs/heads/main
         refs/heads/master
-        ', github.ref) == false
+        ', github.ref) }}
       run: |
         set -ue ;
         tag=$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}} | cut -c 1-20 | tr / -) ;
@@ -88,7 +88,7 @@ runs:
         echo 'pactbroker.auth.username=${{ fromJSON(inputs.secrets).PACT_BROKER_USERNAME }}' >> "$CONF_FILE"
         echo 'pactbroker.auth.password=${{ fromJSON(inputs.secrets).PACT_BROKER_PASSWORD }}' >> "$CONF_FILE"
         
-        echo "tag=$VERSION" >> "$CONF_FILE"
+        echo 'tag=${{ env.VERSION }}' >> "$CONF_FILE"
         echo 'registryHost=${{ fromJSON(inputs.secrets).DOCKER_REGISTRY_HOST }}' >> "$CONF_FILE"
 
 

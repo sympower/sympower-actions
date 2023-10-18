@@ -1,5 +1,5 @@
-name: 'Upload Pacts'
-description: 'Upload pacts to the pact broker'
+name: 'Deploy to staging'
+description: 'Upgrade the staging environment with the latest docker image'
 inputs:
   secrets:
     description: 'Secrets required for the build'

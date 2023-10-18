@@ -1,5 +1,5 @@
 name: 'Code analysis'
-description: 'Run Sonar analysis'
+description: 'Run code analysis'
 inputs:
   secrets:
     description: 'Secrets required for the build'
