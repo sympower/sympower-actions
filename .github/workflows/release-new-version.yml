@@ -46,7 +46,6 @@ jobs:
         with:
           secrets: ${{ toJSON(secrets) }}
           version: ${{ steps.format-version.outputs.version }}
-          gistID: ${{ inputs.gistID }}
       - name: Update Service Version Badge
         if:
           contains('
