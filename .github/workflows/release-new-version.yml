@@ -16,6 +16,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      IS_DEFAULT_BRANCH: ${{ contains('refs/heads/main, refs/heads/master', github.ref) }}
+      secrets: ${{ toJSON(secrets) }}
     outputs:
       version: ${{ env.VERSION }}
     steps:
@@ -23,10 +26,12 @@ jobs:
         name: "Setup build environment"
         uses: sympower/sympower-actions/.github/actions/setup-build-environment@TECH-1140-split-workflow-into-composite-actions
         with:
-          secrets: ${{ toJSON(secrets) }}
+          secrets: ${{ env.secrets }}
       - id: format-version
         name: "Format version"
         uses: sympower/sympower-actions/.github/actions/format-version@TECH-1140-split-workflow-into-composite-actions
+        with:
+          style-as-release: ${{ env.IS_DEFAULT_BRANCH }}
       - id: run-tests
         name: "Run tests"
         uses: sympower/sympower-actions/.github/actions/run-tests@TECH-1140-split-workflow-into-composite-actions
@@ -34,24 +39,15 @@ jobs:
         name: "Code analysis"
         uses: sympower/sympower-actions/.github/actions/code-analysis@TECH-1140-split-workflow-into-composite-actions
         with:
-          secrets: ${{ toJSON(secrets) }}
+          secrets: ${{ env.secrets }}
       - id: build-and-upload-docker-image
         name: "Build and upload Docker Image"
-        if:
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
+        if: ${{ env.IS_DEFAULT_BRANCH }}
         uses: sympower/sympower-actions/.github/actions/build-and-upload-docker-image@TECH-1140-split-workflow-into-composite-actions
         with:
-          secrets: ${{ toJSON(secrets) }}
           version: ${{ steps.format-version.outputs.version }}
       - name: Update Service Version Badge
-        if:
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
+        if: ${{ env.IS_DEFAULT_BRANCH }}
         uses: schneegans/dynamic-badges-action@v1.6.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
@@ -62,36 +58,25 @@ jobs:
           color: blue
       - id: upload-schema
         name: "Upload schema"
-        if:
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
+        if: ${{ env.IS_DEFAULT_BRANCH }}
         uses: sympower/sympower-actions/.github/actions/upload-schema@TECH-1140-split-workflow-into-composite-actions
         with:
+          allow-release-if-changes: ${{ env.IS_DEFAULT_BRANCH }}
           version: ${{ steps.format-version.outputs.version }}
-          secrets: ${{ toJSON(secrets) }}
+          secrets: ${{ env.secrets }}
           gistID: ${{ inputs.gistID }}
       - id: upload-pacts
         name: "Upload pacts"
-        if:
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
+        if: ${{ env.IS_DEFAULT_BRANCH }}
         uses: sympower/sympower-actions/.github/actions/upload-pacts@TECH-1140-split-workflow-into-composite-actions
         with:
           version: ${{ steps.format-version.outputs.version }}
       - id: deploy-staging
         name: "Deploy staging"
-        if:
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
+        if: ${{ env.IS_DEFAULT_BRANCH }}
         uses: sympower/sympower-actions/.github/actions/deploy-staging@TECH-1140-split-workflow-into-composite-actions
         with:
-          secrets: ${{ toJSON(secrets) }}
+          secrets: ${{ env.secrets }}
           version: ${{ steps.format-version.outputs.version }}
           default-name: ${{ env.REPOSITORY_NAME }}
       - id: upload-build-artifacts

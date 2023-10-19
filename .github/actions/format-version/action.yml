@@ -1,5 +1,9 @@
 name: 'Format version'
 description: 'Format version'
+inputs:
+  style-as-release:
+    description: "true/false flag to format version in release style (yyyy.MM.dd.hh.mm-hash) or as branch reference"
+    required: true
 outputs:
   version:
     description: Version number of the image released to ECR
@@ -13,13 +17,14 @@ runs:
       run: |
         set -eu
         
-        REF_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}
-        if [ "$REF_NAME" = "main" ] || [ "$REF_NAME" = "master" ]; then
+        IS_RELEASE_STYLE='${{ inputs.style-as-release }}'
+        
+        if [ "$IS_RELEASE_STYLE" = "true" ] ; then
           currentDate=$(date +"%Y.%m.%d.%H.%M") ;
           tag=$(echo $GITHUB_SHA | cut -c 1-7) ;
           echo "version=$(echo $currentDate-$tag)" >> $GITHUB_OUTPUT ;
         else
-          set -ue ;
+          REF_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}
           tag=$(echo ${REF_NAME} | cut -c 1-20 | tr / -) ;
           echo "version=$(echo $tag)" >> $GITHUB_OUTPUT ;
         fi
