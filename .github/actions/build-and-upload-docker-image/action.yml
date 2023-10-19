@@ -24,7 +24,7 @@ runs:
           -Djib.from.platforms=linux/amd64,linux/arm64 
 
     - name: Update Service Version Badge
-      if: ${{ inputs.gistID != "will-no-update" }}
+      if: inputs.gistID != 'will-no-update'
       uses: schneegans/dynamic-badges-action@v1.6.0
       with:
         auth: ${{ fromJSON(inputs.secrets).GIST_SECRET }}
