@@ -5,7 +5,7 @@ inputs:
     description: 'Version of the artifact to be published'
     required: true
   gistID:
-    description: 'ID of the gist to update'
+    description: 'ID of the gist with the version badge to update'
     required: true
   secrets:
     description: 'Secrets required for the build'
