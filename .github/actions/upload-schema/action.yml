@@ -38,7 +38,7 @@ runs:
       shell: bash
       if:
         inputs.allow-release-if-changes
-        env.HAS_SCHEMA == 'true'
+        && env.HAS_SCHEMA == 'true'
         && steps.schema-files.outputs.any_modified == 'true'
       run: |
         set -eu
