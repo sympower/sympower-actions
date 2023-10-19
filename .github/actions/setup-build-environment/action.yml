@@ -5,6 +5,10 @@ inputs:
     description: 'Secrets required for the build'
     required: true
     default: '{}'
+outputs:
+  version:
+    description: Version number of the image released to ECR
+    value: ${{ steps.calculate-version.outputs.version }}
 runs:
   using: "composite"
   steps:
@@ -31,47 +35,12 @@ runs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Set env
+    - id: set-environment
+      name: Set environment
+      shell: bash
       run: |
         set -ue ;
-        currentDate=$(date +"%Y.%m.%d.%H.%M") ;
-        tag=$(echo $GITHUB_SHA | cut -c 1-7) ;
-        echo "VERSION=$(echo $currentDate-$tag)" >> $GITHUB_ENV ;
-        echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
-      shell: bash
-
-    - name: Set env for main/master branch
-      if:
-        contains('
-        refs/heads/main
-        refs/heads/master
-        ', github.ref)
-      run: |
-        set -ue ;
-        currentDate=$(date +"%Y.%m.%d.%H.%M") ;
-        tag=$(echo $GITHUB_SHA | cut -c 1-7) ;
-        echo "VERSION=$(echo $currentDate-$tag)" >> $GITHUB_ENV ;
-        echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
-      shell: bash
-
-    - name: Set env for non-main/master
-      if:
-        ${{ ! contains('
-        refs/heads/main
-        refs/heads/master
-        ', github.ref) }}
-      run: |
-        set -ue ;
-        tag=$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}} | cut -c 1-20 | tr / -) ;
-        echo "VERSION=$(echo $tag)" >> $GITHUB_ENV ;
-        echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
-      shell: bash
-
-    - name: Configure Gradle
-      shell: bash
-      run: |
-        set -eu
-        
+             
         mkdir -p ~/.gradle
         CONF_FILE=~/.gradle/gradle.properties
         
@@ -88,9 +57,30 @@ runs:
         echo 'pactbroker.auth.username=${{ fromJSON(inputs.secrets).PACT_BROKER_USERNAME }}' >> "$CONF_FILE"
         echo 'pactbroker.auth.password=${{ fromJSON(inputs.secrets).PACT_BROKER_PASSWORD }}' >> "$CONF_FILE"
         
-        echo 'tag=${{ env.VERSION }}' >> "$CONF_FILE"
         echo 'registryHost=${{ fromJSON(inputs.secrets).DOCKER_REGISTRY_HOST }}' >> "$CONF_FILE"
+        
+        ## Configure environment variables
+        echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+        echo PACT_BROKER_BASE_URL=${{ fromJSON(inputs.secrets).PACT_BROKER_BASE_URL }} >> $GITHUB_ENV
+        echo PACT_BROKER_USERNAME=${{ fromJSON(inputs.secrets).PACT_BROKER_USERNAME }}  >> $GITHUB_ENV
+        echo PACT_BROKER_PASSWORD=${{ fromJSON(inputs.secrets).PACT_BROKER_PASSWORD }}  >> $GITHUB_ENV
 
+    - id: calculate-version
+      name: "Calculate version"
+      shell: bash
+      run: |
+        set -eu
+        
+        REF_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}
+        if [ "$REF_NAME" = "main" ] || [ "$REF_NAME" = "master" ]; then
+          currentDate=$(date +"%Y.%m.%d.%H.%M") ;
+          tag=$(echo $GITHUB_SHA | cut -c 1-7) ;
+          echo "version=$(echo $currentDate-$tag)" >> $GITHUB_OUTPUT ;
+        else
+          set -ue ;
+          tag=$(echo ${REF_NAME} | cut -c 1-20 | tr / -) ;
+          echo "version=$(echo $tag)" >> $GITHUB_OUTPUT ;
+        fi
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1-node16

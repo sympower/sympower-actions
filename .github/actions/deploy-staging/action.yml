@@ -5,6 +5,12 @@ inputs:
     description: 'Secrets required for the build'
     required: true
     default: '{}'
+  version:
+    description: 'Version number of the image released to ECR'
+    required: true
+  default-name:
+    description: 'Default service and component name to use when not specified in the auto-deployment file'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -21,8 +27,8 @@ runs:
       run: |
         set -ue
         
-        REPOSITORY_NAME='${{ env.REPOSITORY_NAME }}'
-        VERSION='${{ env.VERSION }}'
+        IMAGE_NAME='${{ inputs.repository-name }}'
+        VERSION='${{ inputs.version }}'
         
         for env in $( ls auto-deploy/*.env.json ) ; do
         

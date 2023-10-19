@@ -29,19 +29,20 @@ jobs:
         uses: sympower/sympower-actions/.github/actions/run-tests@TECH-1140-split-workflow-into-composite-actions
       - id: code-analysis
         name: "Code analysis"
-        uses: sympower/sympower-actions/.github/actions/code-analyzis@TECH-1140-split-workflow-into-composite-actions
+        uses: sympower/sympower-actions/.github/actions/code-analysis@TECH-1140-split-workflow-into-composite-actions
         with:
           secrets: ${{ toJSON(secrets) }}
-      - id: docker-image
-        name: "Build docker image"
+      - id: build-and-upload-docker-image
+        name: "Build and upload Docker Image"
         if:
           contains('
           refs/heads/main
           refs/heads/master
           ', github.ref)
-        uses: sympower/sympower-actions/.github/actions/docker-image@TECH-1140-split-workflow-into-composite-actions
+        uses: sympower/sympower-actions/.github/actions/build-and-upload-docker-image@TECH-1140-split-workflow-into-composite-actions
         with:
           secrets: ${{ toJSON(secrets) }}
+          version: ${{ steps.setup-build-environment.outputs.version }}
           gistID: ${{ inputs.gistID }}
       - id: upload-schema
         name: "Upload schema"
@@ -52,6 +53,7 @@ jobs:
           ', github.ref)
         uses: sympower/sympower-actions/.github/actions/upload-schema@TECH-1140-split-workflow-into-composite-actions
         with:
+          version: ${{ steps.setup-build-environment.outputs.version }}
           secrets: ${{ toJSON(secrets) }}
           gistID: ${{ inputs.gistID }}
       - id: upload-pacts
@@ -63,7 +65,7 @@ jobs:
           ', github.ref)
         uses: sympower/sympower-actions/.github/actions/upload-pacts@TECH-1140-split-workflow-into-composite-actions
         with:
-          secrets: ${{ toJSON(secrets) }}
+          version: ${{ steps.setup-build-environment.outputs.version }}
       - id: deploy-staging
         name: "Deploy staging"
         if:
@@ -74,6 +76,8 @@ jobs:
         uses: sympower/sympower-actions/.github/actions/deploy-staging@TECH-1140-split-workflow-into-composite-actions
         with:
           secrets: ${{ toJSON(secrets) }}
+          version: ${{ steps.setup-build-environment.outputs.version }}
+          default-name: ${{ env.REPOSITORY_NAME }}
       - id: upload-build-artifacts
         name: "Upload build artifacts"
         if: always()

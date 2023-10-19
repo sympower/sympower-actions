@@ -1,6 +1,9 @@
 name: 'Upload Schema'
 description: 'If there are changes to schema, upload it to Nexus'
 inputs:
+  version:
+    description: 'Version of the artifact to be published'
+    required: true
   gistID:
     description: 'ID of the gist to update'
     required: true
@@ -33,7 +36,11 @@ runs:
       if:
         env.HAS_SCHEMA == 'true'
         && steps.schema-files.outputs.any_modified == 'true'
-      run: ./gradlew publish --parallel --continue --stacktrace
+      run: |
+        set -eu
+        
+        ./gradlew publish --parallel --continue --stacktrace \
+          -Ptag=${{ inputs.version }}
 
     - name: Update Schema Version Badge
       if:
