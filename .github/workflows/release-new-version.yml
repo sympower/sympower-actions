@@ -44,6 +44,20 @@ jobs:
           secrets: ${{ toJSON(secrets) }}
           version: ${{ steps.setup-build-environment.outputs.version }}
           gistID: ${{ inputs.gistID }}
+      - name: Update Service Version Badge
+        if:
+          contains('
+          refs/heads/main
+          refs/heads/master
+          ', github.ref)
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ inputs.gistID }}
+          filename: ${{ env.REPOSITORY_NAME }}-service.json
+          label: Service Version
+          message: ${{ inputs.version }}
+          color: blue
       - id: upload-schema
         name: "Upload schema"
         if:

@@ -4,10 +4,6 @@ inputs:
   version:
     description: 'Version number of the image released to ECR'
     required: true
-  gistID:
-    description: 'ID of the gist to update'
-    required: true
-    default: "will-no-update"
   secrets:
     description: 'Secrets required for the build'
     required: true
@@ -21,15 +17,4 @@ runs:
         set -ue ;
         ./gradlew jib --parallel --continue --stacktrace \
           -Ptag=${{ inputs.version }} \
-          -Djib.from.platforms=linux/amd64,linux/arm64 
-
-    - name: Update Service Version Badge
-      if: inputs.gistID != 'will-no-update'
-      uses: schneegans/dynamic-badges-action@v1.6.0
-      with:
-        auth: ${{ fromJSON(inputs.secrets).GIST_SECRET }}
-        gistID: ${{ inputs.gistID }}
-        filename: ${{ env.REPOSITORY_NAME }}-service.json
-        label: Service Version
-        message: ${{ inputs.version }}
-        color: blue
+          -Djib.from.platforms=linux/amd64,linux/arm64
