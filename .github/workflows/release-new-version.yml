@@ -24,6 +24,9 @@ jobs:
         uses: sympower/sympower-actions/.github/actions/setup-build-environment@TECH-1140-split-workflow-into-composite-actions
         with:
           secrets: ${{ toJSON(secrets) }}
+      - id: format-version
+        name: "Format version"
+        uses: sympower/sympower-actions/.github/actions/format-version@TECH-1140-split-workflow-into-composite-actions
       - id: run-tests
         name: "Run tests"
         uses: sympower/sympower-actions/.github/actions/run-tests@TECH-1140-split-workflow-into-composite-actions
@@ -42,7 +45,7 @@ jobs:
         uses: sympower/sympower-actions/.github/actions/build-and-upload-docker-image@TECH-1140-split-workflow-into-composite-actions
         with:
           secrets: ${{ toJSON(secrets) }}
-          version: ${{ steps.setup-build-environment.outputs.version }}
+          version: ${{ steps.format-version.outputs.version }}
           gistID: ${{ inputs.gistID }}
       - name: Update Service Version Badge
         if:
@@ -67,7 +70,7 @@ jobs:
           ', github.ref)
         uses: sympower/sympower-actions/.github/actions/upload-schema@TECH-1140-split-workflow-into-composite-actions
         with:
-          version: ${{ steps.setup-build-environment.outputs.version }}
+          version: ${{ steps.format-version.outputs.version }}
           secrets: ${{ toJSON(secrets) }}
           gistID: ${{ inputs.gistID }}
       - id: upload-pacts
@@ -79,7 +82,7 @@ jobs:
           ', github.ref)
         uses: sympower/sympower-actions/.github/actions/upload-pacts@TECH-1140-split-workflow-into-composite-actions
         with:
-          version: ${{ steps.setup-build-environment.outputs.version }}
+          version: ${{ steps.format-version.outputs.version }}
       - id: deploy-staging
         name: "Deploy staging"
         if:
@@ -90,7 +93,7 @@ jobs:
         uses: sympower/sympower-actions/.github/actions/deploy-staging@TECH-1140-split-workflow-into-composite-actions
         with:
           secrets: ${{ toJSON(secrets) }}
-          version: ${{ steps.setup-build-environment.outputs.version }}
+          version: ${{ steps.format-version.outputs.version }}
           default-name: ${{ env.REPOSITORY_NAME }}
       - id: upload-build-artifacts
         name: "Upload build artifacts"
