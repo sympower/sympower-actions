@@ -1,9 +1,6 @@
 name: 'Upload Schema'
 description: 'If there are changes to schema, upload it to Nexus'
 inputs:
-  allow-release-if-changes:
-    description: "true/false flag to indicate if the workflow should upload schema if there are changes"
-    required: true
   version:
     description: 'Version of the artifact to be published'
     required: true
@@ -37,8 +34,7 @@ runs:
     - name: Upload schema
       shell: bash
       if:
-        inputs.allow-release-if-changes
-        && env.HAS_SCHEMA == 'true'
+        env.HAS_SCHEMA == 'true'
         && steps.schema-files.outputs.any_modified == 'true'
       run: |
         set -eu
@@ -48,8 +44,7 @@ runs:
 
     - name: Update Schema Version Badge
       if:
-        inputs.allow-release-if-changes 
-        && env.HAS_SCHEMA == 'true'
+        env.HAS_SCHEMA == 'true'
         && steps.schema-files.outputs.any_modified == 'true'
       uses: schneegans/dynamic-badges-action@v1.6.0
       with:

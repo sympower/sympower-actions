@@ -61,7 +61,6 @@ jobs:
         if: env.IS_DEFAULT_BRANCH == 'true'
         uses: sympower/sympower-actions/.github/actions/upload-schema@TECH-1140-split-workflow-into-composite-actions
         with:
-          allow-release-if-changes: ${{ env.IS_DEFAULT_BRANCH }}
           version: ${{ steps.format-version.outputs.version }}
           secrets: ${{ env.secrets }}
           gistID: ${{ inputs.gistID }}
