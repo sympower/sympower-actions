@@ -11,7 +11,7 @@ runs:
     - name: Sonar analysis
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ fromJSON(inputs.secrets).GIT_TOKEN }}  # Needed to get PR information, if any
+        GITHUB_TOKEN: ${{ fromJSON(inputs.secrets).GITHUB_TOKEN }}  # Needed to get PR information, if any
         SONAR_TOKEN: ${{ fromJSON(inputs.secrets).SONAR_TOKEN }}
       run: |
         set -ue ;
