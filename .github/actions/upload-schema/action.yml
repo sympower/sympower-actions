@@ -11,13 +11,16 @@ inputs:
     description: 'Secrets required for the build'
     required: true
     default: '{}'
+  schema-module:
+    description: 'Gradle module ťo check for schema file changes'
+    default: 'schema'
 runs:
   using: "composite"
   steps:
     - name: Check if schema exists
       shell: bash
       run: |
-        if [ -d "schema" ]; then
+        if [ -d "${{ inputs.schema-module }}" ]; then
           echo "HAS_SCHEMA=true" >> $GITHUB_ENV ;
         else
           echo "HAS_SCHEMA=false" >> $GITHUB_ENV ;
@@ -29,7 +32,7 @@ runs:
       uses: tj-actions/changed-files@v39
       with:
         since_last_remote_commit: "true"
-        files: schema/**
+        files: ${{ inputs.schema-module }}/**
 
     - name: Upload schema
       shell: bash
