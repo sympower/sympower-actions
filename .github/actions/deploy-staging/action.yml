@@ -1,0 +1,75 @@
+name: 'Deploy to staging'
+description: 'Upgrade the staging environment with the latest docker image'
+inputs:
+  secrets:
+    description: 'Secrets required for the build'
+    required: true
+    default: '{}'
+  version:
+    description: 'Version number of the image released to ECR'
+    required: true
+  default-name:
+    description: 'Default service and component name to use when not specified in the auto-deployment file'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: tibdex/github-app-token@v2
+      id: generate-token
+      with:
+        app_id: ${{ fromJSON(inputs.secrets).AUTODEPLOYER_ID }}
+        private_key: ${{ fromJSON(inputs.secrets).AUTODEPLOYER_KEY }}
+
+    - name: Trigger deployments
+      shell: bash
+      env:
+        DEPLOYER_TOKEN: ${{ steps.generate-token.outputs.token }}
+      run: |
+        set -ue
+        
+        IMAGE_NAME='${{ inputs.repository-name }}'
+        VERSION='${{ inputs.version }}'
+        
+        for env in $( ls auto-deploy/*.env.json ) ; do
+        
+          ENVIRONMENT=$( jq -r '.environment' "$env" )
+          COMPONENT=$( jq -r '.component' "$env" )
+          SERVICE=$( jq -r '.service' "$env" )
+        
+          if [ -z "$ENVIRONMENT" ] || [ "$ENVIRONMENT" = "null" ] ; then
+            echo "ERROR: Missing environment in $env"
+            exit 1
+          fi
+        
+          if [ -z "$COMPONENT" ] || [ "$COMPONENT" = "null" ] ; then
+            COMPONENT="$REPOSITORY_NAME"
+          fi
+        
+          if [ -z "$SERVICE" ]|| [ "$SERVICE" = "null" ] ; then
+            SERVICE="$REPOSITORY_NAME"
+          fi
+        
+          DISPATCH_EVENT="$REPOSITORY_NAME calls update version to $VERSION for $COMPONENT/$SERVICE in $ENVIRONMENT"
+        
+          BODY='{
+            "event_type": "update_version_event",
+            "client_payload": {
+              "dispatch_event": "'"$DISPATCH_EVENT"'",
+              "environment": "'"$ENVIRONMENT"'",
+              "component": "'"$COMPONENT"'",
+              "service": "'"$SERVICE"'",
+              "version": "'"$VERSION"'"
+            }
+          }'
+        
+          echo "$DISPATCH_EVENT"
+        
+          curl -H "Accept: application/vnd.github.everest-preview+json" \
+            -H "Authorization: token ${DEPLOYER_TOKEN}" \
+            --request POST \
+            --data "${BODY}" \
+            https://api.github.com/repos/sympower/environments/dispatches
+        
+          echo "Done: $DISPATCH_EVENT"
+        
+        done

@@ -12,308 +12,73 @@ on:
       version:
         description: Version number of the image released to ECR
         value: ${{ jobs.build.outputs.version }}
-    secrets:
-      GIT_TOKEN:
-        required: true
-      SONAR_TOKEN:
-        required: true
-      AWS_ACCESS_KEY_ID:
-        required: true
-      AWS_SECRET_ACCESS_KEY:
-        required: true
-      GIST_SECRET:
-        required: true
-      MAVEN_REPO_PUBLIC_URL:
-        required: true
-      MAVEN_REPO_SNAPSHOTS_URL:
-        required: true
-      MAVEN_REPO_RELEASES_URL:
-        required: true
-      MAVEN_REPO_USER:
-        required: true
-      MAVEN_REPO_PASS:
-        required: true
-      DOCKER_REGISTRY_HOST:
-        required: true
-      PACT_BROKER_BASE_URL:
-        required: true
-      PACT_BROKER_USERNAME:
-        required: true
-      PACT_BROKER_PASSWORD:
-        required: true
-      AUTODEPLOYER_ID:
-        required: true
-      AUTODEPLOYER_KEY:
-        required: true
-
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      IS_DEFAULT_BRANCH: ${{ contains('refs/heads/main, refs/heads/master', github.ref) }}
+      secrets: ${{ toJSON(secrets) }}
     outputs:
       version: ${{ env.VERSION }}
     steps:
-      - uses: actions/checkout@v4
+      - id: setup-build-environment
+        name: "Setup build environment"
+        uses: sympower/sympower-actions/.github/actions/setup-build-environment@TECH-1140-split-workflow-into-composite-actions
         with:
-          # Disabling shallow clone is recommended for improving relevancy of reporting
-          fetch-depth: 0
-
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+          secrets: ${{ env.secrets }}
+      - id: format-version
+        name: "Format version"
+        uses: sympower/sympower-actions/.github/actions/format-version@TECH-1140-split-workflow-into-composite-actions
         with:
-          gradle-home-cache-cleanup: true
-
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v3
+          style-as-release: ${{ env.IS_DEFAULT_BRANCH }}
+      - id: run-tests
+        name: "Run tests"
+        uses: sympower/sympower-actions/.github/actions/run-tests@TECH-1140-split-workflow-into-composite-actions
+      - id: code-analysis
+        name: "Code analysis"
+        uses: sympower/sympower-actions/.github/actions/code-analysis@TECH-1140-split-workflow-into-composite-actions
         with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+          secrets: ${{ env.secrets }}
+      - id: build-and-upload-docker-image
+        name: "Build and upload Docker Image"
+        if: env.IS_DEFAULT_BRANCH == 'true'
+        uses: sympower/sympower-actions/.github/actions/build-and-upload-docker-image@TECH-1140-split-workflow-into-composite-actions
         with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build with Gradle
-        env:
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          set -ue ;
-          ./gradlew build integrationTest sonar --parallel --continue --stacktrace \
-            -PsympowerMavenRepoPublicUrl="${{ secrets.MAVEN_REPO_PUBLIC_URL }}" \
-            -PsympowerMavenRepoSnapshotsUrl="${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }}" \
-            -PsympowerMavenRepoReleasesUrl="${{ secrets.MAVEN_REPO_RELEASES_URL }}" \
-            -PsympowerMavenRepoUsername="${{ secrets.MAVEN_REPO_USER }}" \
-            -PsympowerMavenRepoPassword="${{ secrets.MAVEN_REPO_PASS }}" \
-            -Ppactbroker.url="${{ secrets.PACT_BROKER_BASE_URL }}" \
-            -Ppactbroker.auth.username="${{ secrets.PACT_BROKER_USERNAME }}" \
-            -Ppactbroker.auth.password="${{ secrets.PACT_BROKER_PASSWORD }}" \
-            -Ptag="${GITHUB_SHA::7}" ;
-
-      - name: Set env
-        run: |
-          set -ue ;
-          currentDate=$(date +"%Y.%m.%d.%H.%M") ;
-          tag=$(echo $GITHUB_SHA | cut -c 1-7) ;
-          echo "VERSION=$(echo $currentDate-$tag)" >> $GITHUB_ENV ;
-          echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
-        shell: bash
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: 'eu-central-1'
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build Docker Image
-        if:
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
-        run: |
-          set -ue ;
-          ./gradlew jib --parallel --continue --stacktrace \
-            -Djib.from.platforms=linux/amd64,linux/arm64 \
-            -PsympowerMavenRepoPublicUrl="${{ secrets.MAVEN_REPO_PUBLIC_URL }}" \
-            -PsympowerMavenRepoSnapshotsUrl="${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }}" \
-            -PsympowerMavenRepoReleasesUrl="${{ secrets.MAVEN_REPO_RELEASES_URL }}" \
-            -PsympowerMavenRepoUsername="${{ secrets.MAVEN_REPO_USER }}" \
-            -PsympowerMavenRepoPassword="${{ secrets.MAVEN_REPO_PASS }}" \
-            -PregistryHost="${{ secrets.DOCKER_REGISTRY_HOST }}" \
-            -Ptag="${{ env.VERSION }}" ;
-
+          version: ${{ steps.format-version.outputs.version }}
       - name: Update Service Version Badge
-        if:
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
+        if: env.IS_DEFAULT_BRANCH == 'true'
         uses: schneegans/dynamic-badges-action@v1.6.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
           gistID: ${{ inputs.gistID }}
           filename: ${{ env.REPOSITORY_NAME }}-service.json
           label: Service Version
-          message: ${{ env.VERSION }}
+          message: ${{ inputs.version }}
           color: blue
-
-      - name: Check if schema exists
-        if:
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
-        run: |
-          if [ -d "schema" ]; then
-            echo "HAS_SCHEMA=true" >> $GITHUB_ENV ;
-          else
-            echo "HAS_SCHEMA=false" >> $GITHUB_ENV ;
-          fi
-
-      - name: Check for changes in schema
-        if:
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
-          && env.HAS_SCHEMA == 'true'
-        id: schema-files
-        uses: tj-actions/changed-files@v39
+      - id: upload-schema
+        name: "Upload schema"
+        if: env.IS_DEFAULT_BRANCH == 'true'
+        uses: sympower/sympower-actions/.github/actions/upload-schema@TECH-1140-split-workflow-into-composite-actions
         with:
-          since_last_remote_commit: "true"
-          files: schema/**
-
-      - name: Upload schema
-        if:
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
-          && env.HAS_SCHEMA == 'true'
-          && steps.schema-files.outputs.any_modified == 'true'
-        run: |
-          set -ue ;
-          ./gradlew publish --parallel --continue --stacktrace \
-            -PsympowerMavenRepoPublicUrl=${{ secrets.MAVEN_REPO_PUBLIC_URL }} \
-            -PsympowerMavenRepoSnapshotsUrl=${{ secrets.MAVEN_REPO_SNAPSHOTS_URL }} \
-            -PsympowerMavenRepoReleasesUrl=${{ secrets.MAVEN_REPO_RELEASES_URL }} \
-            -PsympowerMavenRepoUsername=${{ secrets.MAVEN_REPO_USER }} \
-            -PsympowerMavenRepoPassword=${{ secrets.MAVEN_REPO_PASS }} \
-            -Ptag="${{ env.VERSION }}" ;
-
-      - name: Update Schema Version Badge
-        if:
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
-          && env.HAS_SCHEMA == 'true'
-          && steps.schema-files.outputs.any_modified == 'true'
-        uses: schneegans/dynamic-badges-action@v1.6.0
-        with:
-          auth: ${{ secrets.GIST_SECRET }}
+          version: ${{ steps.format-version.outputs.version }}
+          secrets: ${{ env.secrets }}
           gistID: ${{ inputs.gistID }}
-          filename: ${{ env.REPOSITORY_NAME }}-schema.json
-          label: Schema Version
-          message: ${{ env.VERSION }}
-          color: orange
-
-      - name: Upload Pacts
-        if:
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
-        run: |
-          set -ue ;
-          for PACT_DIR in $( find . | grep build/pacts$ | sed 's/^.\///' ) ; do
-            echo "Uploading pacts in: ${PACT_DIR}"
-            docker run --rm \
-             -w ${PWD} \
-             -v ${PWD}:${PWD} \
-             -e PACT_BROKER_BASE_URL=${{ secrets.PACT_BROKER_BASE_URL }} \
-             -e PACT_BROKER_USERNAME=${{ secrets.PACT_BROKER_USERNAME }} \
-             -e PACT_BROKER_PASSWORD=${{ secrets.PACT_BROKER_PASSWORD }} \
-              pactfoundation/pact-cli:0.50.0.27 \
-              publish \
-              ${PWD}/${PACT_DIR} \
-              --consumer-app-version "${{ env.VERSION }}"
-          done
-
-      - uses: tibdex/github-app-token@v2
-        id: generate-token
+      - id: upload-pacts
+        name: "Upload pacts"
+        if: env.IS_DEFAULT_BRANCH == 'true'
+        uses: sympower/sympower-actions/.github/actions/upload-pacts@TECH-1140-split-workflow-into-composite-actions
         with:
-          app_id: ${{ secrets.AUTODEPLOYER_ID }}
-          private_key: ${{ secrets.AUTODEPLOYER_KEY }}
-
-      - name: Trigger deployments
-        env:
-          DEPLOYER_TOKEN: ${{ steps.generate-token.outputs.token }}
-        if :
-          contains('
-          refs/heads/main
-          refs/heads/master
-          ', github.ref)
-        run: |
-          set -ue
-  
-          REPOSITORY_NAME='${{ env.REPOSITORY_NAME }}'
-          VERSION='${{ env.VERSION }}'
-          
-          for env in $( ls auto-deploy/*.env.json ) ; do
-        
-            ENVIRONMENT=$( jq -r '.environment' "$env" )
-            COMPONENT=$( jq -r '.component' "$env" )
-            SERVICE=$( jq -r '.service' "$env" )
-          
-            if [ -z "$ENVIRONMENT" ] || [ "$ENVIRONMENT" = "null" ] ; then
-              echo "ERROR: Missing environment in $env"
-              exit 1
-            fi
-            
-            if [ -z "$COMPONENT" ] || [ "$COMPONENT" = "null" ] ; then
-              COMPONENT="$REPOSITORY_NAME"
-            fi
-            
-            if [ -z "$SERVICE" ]|| [ "$SERVICE" = "null" ] ; then
-              SERVICE="$REPOSITORY_NAME"
-            fi
-          
-            DISPATCH_EVENT="$REPOSITORY_NAME calls update version to $VERSION for $COMPONENT/$SERVICE in $ENVIRONMENT"
-          
-            BODY='{
-              "event_type": "update_version_event",
-              "client_payload": {
-                "dispatch_event": "'"$DISPATCH_EVENT"'",
-                "environment": "'"$ENVIRONMENT"'",
-                "component": "'"$COMPONENT"'",
-                "service": "'"$SERVICE"'",
-                "version": "'"$VERSION"'"
-              }
-            }'
-        
-            echo "$DISPATCH_EVENT"
-          
-            curl -H "Accept: application/vnd.github.everest-preview+json" \
-              -H "Authorization: token ${DEPLOYER_TOKEN}" \
-              --request POST \
-              --data "${BODY}" \
-              https://api.github.com/repos/sympower/environments/dispatches
-          
-            echo "Done: $DISPATCH_EVENT"
-          
-          done    
-
-      - name: Zip artifacts
-        if: always()
-        run: |
-          set -ue ;
-          found_files=$(find . -type f -path "*/build/reports/*" -print)
-          
-          if [ -n "$found_files" ]; then
-            echo "Directory exists, running zip command..."
-            echo "$found_files" | xargs zip -r reports.zip
-          else
-            echo "Directory does not exist, skipping zip command."
-          fi
-
-      - name: Upload build results
-        if: always()
-        uses: actions/upload-artifact@v3
+          version: ${{ steps.format-version.outputs.version }}
+      - id: deploy-staging
+        name: "Deploy staging"
+        if: env.IS_DEFAULT_BRANCH == 'true'
+        uses: sympower/sympower-actions/.github/actions/deploy-staging@TECH-1140-split-workflow-into-composite-actions
         with:
-          name: results
-          retention-days: 1
-          path: |
-            reports.zip
+          secrets: ${{ env.secrets }}
+          version: ${{ steps.format-version.outputs.version }}
+          default-name: ${{ env.REPOSITORY_NAME }}
+      - id: upload-build-artifacts
+        name: "Upload build artifacts"
+        if: always()
+        uses: sympower/sympower-actions/.github/actions/upload-build-artifacts@TECH-1140-split-workflow-into-composite-actions

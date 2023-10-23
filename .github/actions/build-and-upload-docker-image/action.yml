@@ -1,0 +1,16 @@
+name: 'Build and upload Docker Image'
+description: 'Build and upload Docker Image to ECR'
+inputs:
+  version:
+    description: 'Version number of the image released to ECR'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Build Docker Image
+      shell: bash
+      run: |
+        set -ue ;
+        ./gradlew jib --parallel --continue --stacktrace \
+          -Ptag=${{ inputs.version }} \
+          -Djib.from.platforms=linux/amd64,linux/arm64

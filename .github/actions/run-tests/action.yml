@@ -1,0 +1,92 @@
+name: 'Run Tests'
+description: 'Run tests, behaviour tests and integration tests'
+runs:
+  using: "composite"
+  steps:
+    - name: Run unit tests
+      shell: bash
+      run: ./gradlew test --parallel --continue --stacktrace
+
+    - name: Check test XML files exist
+      id: search-test-results
+      shell: bash
+      run: |
+        if find . | grep test-results/test | grep -q xml$ ; then
+          echo "TEST_RESULTS_EXIST=true" >> "$GITHUB_ENV"
+        else
+          echo "TEST_RESULTS_EXIST=false" >> "$GITHUB_ENV"
+        fi
+
+    - name: Unit test report
+      if: env.TEST_RESULTS_EXIST
+      uses: phoenix-actions/test-reporting@v12
+      continue-on-error: true
+      env:
+        NODE_OPTIONS: --max-old-space-size=4096
+      with:
+        name: Unit test results
+        path: '**/test-results/test/*.xml'
+        reporter: java-junit
+        fail-on-error: false
+        output-to: step-summary
+
+
+
+    - name: Run behaviour tests
+      shell: bash
+      run: ./gradlew behaviourTest --parallel --continue --stacktrace
+
+    - name: Check behaviourTest XML files exist
+      id: search-behaviourTest-results
+      shell: bash
+      run: |
+        if find . | grep test-results/behaviourTest | grep -q xml$ ; then
+          echo "BEHAVIOUR_TEST_RESULTS_EXIST=true" >> "$GITHUB_ENV"
+        else
+          echo "BEHAVIOUR_TEST_RESULTS_EXIST=false" >> "$GITHUB_ENV"
+        fi
+
+    - name: Behaviour test report
+      if: env.BEHAVIOUR_TEST_RESULTS_EXIST
+      uses: phoenix-actions/test-reporting@v12
+      continue-on-error: true
+      env:
+        NODE_OPTIONS: --max-old-space-size=4096
+      with:
+        name: Behaviour test results
+        path: '**/test-results/behaviourTest/*.xml'
+        reporter: java-junit
+        fail-on-error: false
+        output-to: step-summary
+
+
+    - name: Run integration tests
+      shell: bash
+      run: ./gradlew integrationTest --parallel --continue --stacktrace
+
+    - name: Check integrationTest XML files exist
+      id: search-integrationTest-results
+      shell: bash
+      run: |
+        if find . | grep test-results/integrationTest | grep -q xml$ ; then
+          echo "INTEGRATION_TEST_RESULTS_EXIST=true" >> "$GITHUB_ENV"
+        else
+          echo "INTEGRATION_TEST_RESULTS_EXIST=false" >> "$GITHUB_ENV"
+        fi
+
+    - name: Integration test report
+      if: env.INTEGRATION_TEST_RESULTS_EXIST
+      uses: phoenix-actions/test-reporting@v12
+      continue-on-error: true
+      env:
+        NODE_OPTIONS: --max-old-space-size=4096
+      with:
+        name: Integration test results
+        path: '**/test-results/integrationTest/*.xml'
+        reporter: java-junit
+        fail-on-error: false
+        output-to: step-summary
+
+    - name: Create test reports
+      shell: bash
+      run: ./gradlew testCodeCoverageReport behaviourTestCodeCoverageReport integrationTestCodeCoverageReport jacocoTestReport -x test -x behaviourTest -x integrationTest --parallel --continue --stacktrace
