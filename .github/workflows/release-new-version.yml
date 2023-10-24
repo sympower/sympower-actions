@@ -24,26 +24,26 @@ jobs:
     steps:
       - id: setup-build-environment
         name: "Setup build environment"
-        uses: sympower/sympower-composite-actions/setup-build-environment@v2023.10.24.10.59-6014a9a
+        uses: sympower/sympower-actions/.github/actions/setup-build-environment@main
         with:
           secrets: ${{ env.secrets }}
       - id: format-version
         name: "Format version"
-        uses: sympower/sympower-composite-actions/format-version@v2023.10.24.10.59-6014a9a
+        uses: sympower/sympower-actions/.github/actions/format-version@main
         with:
           style-as-release: ${{ env.IS_DEFAULT_BRANCH }}
       - id: run-tests
         name: "Run tests"
-        uses: sympower/sympower-composite-actions/run-tests@v2023.10.24.10.59-6014a9a
+        uses: sympower/sympower-actions/.github/actions/run-tests@main
       - id: code-analysis
         name: "Code analysis"
-        uses: sympower/sympower-composite-actions/code-analysis@v2023.10.24.10.59-6014a9a
+        uses: sympower/sympower-actions/.github/actions/code-analysis@main
         with:
           secrets: ${{ env.secrets }}
       - id: build-and-upload-docker-image
         name: "Build and upload Docker Image"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@v2023.10.24.10.59-6014a9a
+        uses: sympower/sympower-actions/.github/actions/build-and-upload-docker-image@main
         with:
           version: ${{ steps.format-version.outputs.version }}
       - name: Update Service Version Badge
@@ -59,7 +59,7 @@ jobs:
       - id: upload-schema
         name: "Upload schema"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-schema@v2023.10.24.10.59-6014a9a
+        uses: sympower/sympower-actions/.github/actions/upload-schema@main
         with:
           version: ${{ steps.format-version.outputs.version }}
           secrets: ${{ env.secrets }}
@@ -67,13 +67,13 @@ jobs:
       - id: upload-pacts
         name: "Upload pacts"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-pacts@v2023.10.24.10.59-6014a9a
+        uses: sympower/sympower-actions/.github/actions/upload-pacts@main
         with:
           version: ${{ steps.format-version.outputs.version }}
       - id: deploy-staging
         name: "Deploy staging"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/deploy-staging@v2023.10.24.10.59-6014a9a
+        uses: sympower/sympower-actions/.github/actions/deploy-staging@main
         with:
           secrets: ${{ env.secrets }}
           version: ${{ steps.format-version.outputs.version }}
@@ -81,4 +81,4 @@ jobs:
       - id: upload-build-artifacts
         name: "Upload build artifacts"
         if: always()
-        uses: sympower/sympower-composite-actions/upload-build-artifacts@v2023.10.24.10.59-6014a9a
+        uses: sympower/sympower-actions/.github/actions/upload-build-artifacts@main

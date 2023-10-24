@@ -1,0 +1,73 @@
+name: 'Setup Build Environment'
+description: 'Setup OpenJDK, Checkout, Login to AWS ECR'
+inputs:
+  secrets:
+    description: 'Secrets required for the build'
+    required: true
+    default: '{}'
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        # Disabling shallow clone is recommended for improving relevancy of reporting
+        fetch-depth: 0
+
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-home-cache-cleanup: true
+
+    - name: Cache SonarCloud packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - id: set-environment
+      name: Set environment
+      shell: bash
+      run: |
+        set -ue ;
+             
+        mkdir -p ~/.gradle
+        CONF_FILE=~/.gradle/gradle.properties
+        
+        echo '# Gradle configuration' > "$CONF_FILE"
+        
+        echo 'sympowerMavenRepoPublicUrl=${{ fromJSON(inputs.secrets).MAVEN_REPO_PUBLIC_URL }}' >> "$CONF_FILE"
+        echo 'sympowerMavenRepoSnapshotsUrl=${{ fromJSON(inputs.secrets).MAVEN_REPO_SNAPSHOTS_URL }}' >> "$CONF_FILE"
+        echo 'sympowerMavenRepoReleasesUrl=${{ fromJSON(inputs.secrets).MAVEN_REPO_RELEASES_URL }}' >> "$CONF_FILE"
+  
+        echo 'sympowerMavenRepoUsername=${{ fromJSON(inputs.secrets).MAVEN_REPO_USER }}' >> "$CONF_FILE"
+        echo 'sympowerMavenRepoPassword=${{ fromJSON(inputs.secrets).MAVEN_REPO_PASS }}' >> "$CONF_FILE"
+        
+        echo 'pactbroker.url=${{ fromJSON(inputs.secrets).PACT_BROKER_BASE_URL }}' >> "$CONF_FILE"
+        echo 'pactbroker.auth.username=${{ fromJSON(inputs.secrets).PACT_BROKER_USERNAME }}' >> "$CONF_FILE"
+        echo 'pactbroker.auth.password=${{ fromJSON(inputs.secrets).PACT_BROKER_PASSWORD }}' >> "$CONF_FILE"
+        
+        echo 'registryHost=${{ fromJSON(inputs.secrets).DOCKER_REGISTRY_HOST }}' >> "$CONF_FILE"
+        
+        ## Configure environment variables
+        echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+        echo PACT_BROKER_BASE_URL=${{ fromJSON(inputs.secrets).PACT_BROKER_BASE_URL }} >> $GITHUB_ENV
+        echo PACT_BROKER_USERNAME=${{ fromJSON(inputs.secrets).PACT_BROKER_USERNAME }}  >> $GITHUB_ENV
+        echo PACT_BROKER_PASSWORD=${{ fromJSON(inputs.secrets).PACT_BROKER_PASSWORD }}  >> $GITHUB_ENV
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ fromJSON(inputs.secrets).AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ fromJSON(inputs.secrets).AWS_SECRET_ACCESS_KEY }}
+        aws-region: 'eu-central-1'
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2

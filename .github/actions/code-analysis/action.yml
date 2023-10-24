@@ -1,0 +1,18 @@
+name: 'Code analysis'
+description: 'Run code analysis'
+inputs:
+  secrets:
+    description: 'Secrets required for the build'
+    required: true
+    default: '{}'
+runs:
+  using: "composite"
+  steps:
+    - name: Sonar analysis
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ fromJSON(inputs.secrets).GITHUB_TOKEN }}  # Needed to get PR information, if any
+        SONAR_TOKEN: ${{ fromJSON(inputs.secrets).SONAR_TOKEN }}
+      run: |
+        set -ue ;
+        ./gradlew sonar -x test -x behaviourTest -x integrationTest -x jacocoTestReport --parallel --continue --stacktrace

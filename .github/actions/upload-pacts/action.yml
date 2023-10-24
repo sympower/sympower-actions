@@ -1,0 +1,26 @@
+name: 'Upload Pacts'
+description: 'Upload pacts to the pact broker'
+inputs:
+  version:
+    description: 'Version pact to be uploaded'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Upload Pacts
+      shell: bash
+      run: |
+        set -ue ;
+        for PACT_DIR in $( find . | grep build/pacts$ | sed 's/^.\///' ) ; do
+          echo "Uploading pacts in: ${PACT_DIR}"
+          docker run --rm \
+           -w ${PWD} \
+           -v ${PWD}:${PWD} \
+           -e PACT_BROKER_BASE_URL \
+           -e PACT_BROKER_USERNAME \
+           -e PACT_BROKER_PASSWORD \
+            pactfoundation/pact-cli:0.50.0.27 \
+            publish \
+            ${PWD}/${PACT_DIR} \
+            --consumer-app-version "${{ inputs.version }}"
+        done

@@ -1,0 +1,27 @@
+name: 'Upload Artifacts'
+description: 'Zip and upload build artifacts'
+runs:
+  using: "composite"
+  steps:
+    - name: Zip artifacts
+      shell: bash
+      if: always()
+      run: |
+        set -ue ;
+        found_files=$(find . -type f -path "*/build/reports/*" -print)
+        
+        if [ -n "$found_files" ]; then
+          echo "Directory exists, running zip command..."
+          echo "$found_files" | xargs zip -r reports.zip
+        else
+          echo "Directory does not exist, skipping zip command."
+        fi
+
+    - name: Upload build results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: results
+        retention-days: 1
+        path: |
+          reports.zip
