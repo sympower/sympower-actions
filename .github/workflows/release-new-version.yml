@@ -54,7 +54,7 @@ jobs:
           gistID: ${{ inputs.gistID }}
           filename: ${{ env.REPOSITORY_NAME }}-service.json
           label: Service Version
-          message: ${{ inputs.version }}
+          message: ${{ steps.format-version.outputs.version }}
           color: blue
       - id: upload-schema
         name: "Upload schema"
