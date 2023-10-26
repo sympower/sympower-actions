@@ -20,7 +20,7 @@ jobs:
       IS_DEFAULT_BRANCH: ${{ contains('refs/heads/main, refs/heads/master', github.ref) }}
       secrets: ${{ toJSON(secrets) }}
     outputs:
-      version: ${{ env.VERSION }}
+      version: ${{ steps.format-version.outputs.version }}
     steps:
       - id: setup-build-environment
         name: "Setup build environment"
