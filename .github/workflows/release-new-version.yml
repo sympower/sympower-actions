@@ -12,6 +12,9 @@ on:
       version:
         description: Version number of the image released to ECR
         value: ${{ jobs.build.outputs.version }}
+      repository-name:
+        description: Name of the repository
+        value: ${{ jobs.format-version.outputs.repository-name }}
 
 jobs:
   build:
@@ -24,26 +27,26 @@ jobs:
     steps:
       - id: setup-build-environment
         name: "Setup build environment"
-        uses: sympower/sympower-composite-actions/setup-build-environment@v2023.10.30.08.44-75ec42d
+        uses: sympower/sympower-composite-actions/setup-build-environment@v2023.10.30.15.12-299ab4a
         with:
           secrets: ${{ env.secrets }}
       - id: format-version
         name: "Format version"
-        uses: sympower/sympower-composite-actions/format-version@v2023.10.30.08.44-75ec42d
+        uses: sympower/sympower-composite-actions/format-version@v2023.10.30.15.12-299ab4a
         with:
           style-as-release: ${{ env.IS_DEFAULT_BRANCH }}
       - id: run-tests
         name: "Run tests"
-        uses: sympower/sympower-composite-actions/run-tests@v2023.10.30.08.44-75ec42d
+        uses: sympower/sympower-composite-actions/run-tests@v2023.10.30.15.12-299ab4a
       - id: code-analysis
         name: "Code analysis"
-        uses: sympower/sympower-composite-actions/code-analysis@v2023.10.30.08.44-75ec42d
+        uses: sympower/sympower-composite-actions/code-analysis@v2023.10.30.15.12-299ab4a
         with:
           secrets: ${{ env.secrets }}
       - id: build-and-upload-docker-image
         name: "Build and upload Docker Image"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@v2023.10.30.08.44-75ec42d
+        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@v2023.10.30.15.12-299ab4a
         with:
           version: ${{ steps.format-version.outputs.version }}
       - name: Update Service Version Badge
@@ -59,7 +62,7 @@ jobs:
       - id: upload-schema
         name: "Upload schema"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-schema@v2023.10.30.08.44-75ec42d
+        uses: sympower/sympower-composite-actions/upload-schema@v2023.10.30.15.12-299ab4a
         with:
           version: ${{ steps.format-version.outputs.version }}
           secrets: ${{ env.secrets }}
@@ -67,13 +70,13 @@ jobs:
       - id: upload-pacts
         name: "Upload pacts"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-pacts@v2023.10.30.08.44-75ec42d
+        uses: sympower/sympower-composite-actions/upload-pacts@v2023.10.30.15.12-299ab4a
         with:
           version: ${{ steps.format-version.outputs.version }}
       - id: deploy-staging
         name: "Deploy staging"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/deploy-to-environment@v2023.10.30.08.44-75ec42d
+        uses: sympower/sympower-composite-actions/deploy-to-environment@v2023.10.30.15.12-299ab4a
         with:
           secrets: ${{ env.secrets }}
           version: ${{ steps.format-version.outputs.version }}
@@ -82,4 +85,4 @@ jobs:
       - id: upload-build-artifacts
         name: "Upload build artifacts"
         if: always()
-        uses: sympower/sympower-composite-actions/upload-build-artifacts@v2023.10.30.08.44-75ec42d
+        uses: sympower/sympower-composite-actions/upload-build-artifacts@v2023.10.30.15.12-299ab4a
