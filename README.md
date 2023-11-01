@@ -8,9 +8,9 @@ individual repository.
 ### release-new-version
 
 `release-new-version` is meant as default workflow that builds, tests, analyses a Java/Kotlin Gradle project and 
-publishes all the relevant artefact, Docker images, pact contracts etc. This workflow is aware whether the branch it is 
+publishes all the relevant artifact, Docker images, pact contracts etc. This workflow is aware whether it is 
 operating on main/master branch or on some development branch. If the branch is not main/master, then the workflow will
-not publish any release artefacts.
+not publish any release artifacts.
 
 This workflow calls following composite actions:
 * [setup-build-environment](https://github.com/sympower/sympower-composite-actions/blob/main/README.md#setup-build-environment)
@@ -48,7 +48,7 @@ jobs:
 ### release-for-testing
 
 `release-for-testing` is meant as default workflow that builds, test, analyses a Java/Kotlin Gradle project and upload 
-schema artefact and Docker image without checking if the branch is main/master or not. This workflow is meant to be used
+schema artifact and Docker image without checking if the branch is main/master or not. This workflow is meant to be used
 for manually publishing testing images and schemas.
 
 This workflow calls following composite actions:
@@ -75,8 +75,9 @@ jobs:
 
 ## Customizing workflows
 
-There are main two approaches to customize the workflows:
+There are two main approaches to customize the workflows:
 * [Extending the default workflow](#extending-the-default-workflow)
+* [Fully custom workflow](#fully-custom-workflow)
 
 ### Extending the default workflow
 
@@ -96,6 +97,8 @@ jobs:
     name: "Custom Job"
     runs-on: ubuntu-latest
     needs: release-new-version
+    # Use if you need it to run only on main/master branch and take out either master or main depending on your default 
+    # branch.
     # if: contains('refs/heads/main, refs/heads/master', github.ref)
     steps:
       # .. 
