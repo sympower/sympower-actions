@@ -40,6 +40,8 @@ jobs:
         uses: sympower/sympower-composite-actions/code-analysis@v2023.11.02.07.24-7054de8
         with:
           secrets: ${{ env.secrets }}
+
+      ### Steps run only in default branch ###
       - id: build-and-upload-docker-image
         name: "Build and upload Docker Image"
         if: env.IS_DEFAULT_BRANCH == 'true'
@@ -47,6 +49,7 @@ jobs:
         with:
           version: ${{ steps.format-version.outputs.version }}
       - run: echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+        if: env.IS_DEFAULT_BRANCH == 'true'
         shell: bash
       - name: Update Service Version Badge
         if: env.IS_DEFAULT_BRANCH == 'true'
@@ -80,6 +83,8 @@ jobs:
           secrets: ${{ env.secrets }}
           version: ${{ steps.format-version.outputs.version }}
           deploy-group: staging
+      ### End of steps run only in default branch ###
+
       - id: upload-build-artifacts
         name: "Upload build artifacts"
         if: always()
