@@ -21,6 +21,11 @@ on:
         description: 'Downstream url where to the trigger will add a comment with a link to the started workflow'
         required: false
         type: string
+      target-environment:
+        description: 'Which environment to take version for other services, i.e., staging or production'
+        type: string
+        required: false
+        default: 'staging'
     secrets:
       TEST_TRIGGER_APP_ID:
         required: true
@@ -48,6 +53,7 @@ jobs:
             { 
               "origin": "${{ inputs.service-name }}", 
               "test-to-trigger": "${{ inputs.test-to-trigger }}", 
+              "target-environment": "${{ inputs.target-environment }}", 
               "${{ inputs.service-name }}-version": "${{ inputs.service-version }}" 
             }
           github_token: ${{ steps.generate-token.outputs.token }}
