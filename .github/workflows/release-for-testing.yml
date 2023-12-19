@@ -38,6 +38,7 @@ jobs:
         uses: sympower/sympower-composite-actions/upload-schema@v2023.11.02.07.24-7054de8
         with:
           secrets: ${{ env.secrets }}
+          style-as-release: false
           version: ${{ steps.format-version.outputs.version }}
           gistID: "not-used"
       - id: upload-build-artifacts
