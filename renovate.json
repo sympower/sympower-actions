@@ -1,6 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "local>sympower/renovate-config"
+  "packageRules": [
+    {
+      "matchPackagePrefixes": ["sympower/sympower-composite-actions"],
+      "automerge": true,
+      "automergeType": "branch"
+    }
   ]
 }
