@@ -53,7 +53,7 @@ jobs:
         shell: bash
       - name: Update Service Version Badge
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: schneegans/dynamic-badges-action@v1.6.0
+        uses: schneegans/dynamic-badges-action@v1.7.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
           gistID: ${{ inputs.gistID }}
