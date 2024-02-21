@@ -18,7 +18,7 @@ jobs:
           set -ue ;
           currentDate=$(date +"%Y.%m.%d.%H.%M") ;
           tag=$(echo $GITHUB_SHA | cut -c 1-7) ;
-          echo "VERSION=$(echo v$currentDate-$tag)" >> $GITHUB_ENV ;
+          echo "VERSION=$(echo $currentDate-$tag)" >> $GITHUB_ENV ;
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
