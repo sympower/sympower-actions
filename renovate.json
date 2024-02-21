@@ -9,8 +9,7 @@
   "packageRules": [
     {
       "matchPackagePrefixes": ["sympower/sympower-composite-actions"],
-      "versioning": "regex:^(?<major>\\d{4})\\.0*(?<minor>\\d{1,2})\\.0*(?<patch>\\d{1,2})\\.0*(?<build>\\d{1,2})\\.0*(?<revision>\\d{1,2})\\-\\w{7}?$",
-      "ignoreUnstable": false
+      "versioning": "loose"
     }
   ]
 }
