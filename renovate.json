@@ -7,9 +7,7 @@
     {
       "matchPackagePrefixes": ["sympower/sympower-composite-actions"],
       "versioning": "regex:^v?(?<major>\\d{4})\\.0*(?<minor>\\d{1,2})\\.0*(?<patch>\\d{1,2})\\.0*(?<build>\\d{1,2})\\.0*(?<revision>\\d{1,2})\\-\\w{7}?$",
-      "ignoreUnstable": false,
-      "automerge": true,
-      "automergeType": "branch"
+      "ignoreUnstable": false
     }
   ]
 }
