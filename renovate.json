@@ -9,7 +9,9 @@
   "packageRules": [
     {
       "matchPackagePrefixes": ["sympower/sympower-composite-actions"],
-      "versioning": "loose"
+      "versioning": "loose",
+      "automerge": true,
+      "automergeType": "branch"
     }
   ]
 }
