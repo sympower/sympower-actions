@@ -20,22 +20,22 @@ jobs:
     steps:
       - id: setup-build-environment
         name: "Setup build environment"
-        uses: sympower/sympower-composite-actions/setup-build-environment@2024.03.13.09.50-00185a9
+        uses: sympower/sympower-composite-actions/setup-build-environment@2024.03.14.07.15-19c7e78
         with:
           secrets: ${{ env.secrets }}
       - id: format-version
         name: "Format version"
-        uses: sympower/sympower-composite-actions/format-version@2024.03.13.09.50-00185a9
+        uses: sympower/sympower-composite-actions/format-version@2024.03.14.07.15-19c7e78
         with:
           style-as-release: ${{ env.IS_DEFAULT_BRANCH }}
       - id: build-and-upload-docker-image
         name: "Build and upload Docker Image"
-        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@2024.03.13.09.50-00185a9
+        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@2024.03.14.07.15-19c7e78
         with:
           version: ${{ steps.format-version.outputs.version }}
       - id: upload-schema
         name: "Upload schema"
-        uses: sympower/sympower-composite-actions/upload-schema@2024.03.13.09.50-00185a9
+        uses: sympower/sympower-composite-actions/upload-schema@2024.03.14.07.15-19c7e78
         with:
           secrets: ${{ env.secrets }}
           style-as-release: false
@@ -44,4 +44,4 @@ jobs:
       - id: upload-build-artifacts
         name: "Upload build artifacts"
         if: always()
-        uses: sympower/sympower-composite-actions/upload-build-artifacts@2024.03.13.09.50-00185a9
+        uses: sympower/sympower-composite-actions/upload-build-artifacts@2024.03.14.07.15-19c7e78
