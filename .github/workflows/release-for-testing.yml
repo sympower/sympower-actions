@@ -33,14 +33,6 @@ jobs:
         uses: sympower/sympower-composite-actions/build-and-upload-docker-image@2024.04.01.08.40-d465e36
         with:
           version: ${{ steps.format-version.outputs.version }}
-      - id: upload-schema
-        name: "Upload schema"
-        uses: sympower/sympower-composite-actions/upload-schema@2024.04.01.08.40-d465e36
-        with:
-          secrets: ${{ env.secrets }}
-          style-as-release: false
-          version: ${{ steps.format-version.outputs.version }}
-          gistID: "not-used"
       - id: upload-build-artifacts
         name: "Upload build artifacts"
         if: always()
