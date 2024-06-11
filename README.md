@@ -21,6 +21,8 @@ the Docker build context resides, typically where your Dockerfile and related
 files are located.
 - **dockerfile_path**: The path to the Dockerfile. This should point to the
 Dockerfile in the build context directory.
+- **platforms**: The list of target platforms for build.
+- **provenance**: Controls whether provenance attestation for the build is required or not.
 
 ### Example of Use
 ```yaml
