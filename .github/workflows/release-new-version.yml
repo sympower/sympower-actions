@@ -40,11 +40,6 @@ jobs:
         uses: sympower/sympower-composite-actions/code-analysis@2024.05.21.08.32-d3e2fe3
         with:
           secrets: ${{ env.secrets }}
-      - id: vulnerabilitiy-analysis
-        name: "Vulnerability analysis"
-        uses: sympower/sympower-composite-actions/vulnerabilities-scan@2024.05.21.08.32-d3e2fe3
-        with:
-          secrets: ${{ env.secrets }}
 
       ### Steps run only in default branch ###
       - id: build-and-upload-docker-image
