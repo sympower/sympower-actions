@@ -24,20 +24,20 @@ jobs:
     steps:
       - id: setup-build-environment
         name: "Setup build environment"
-        uses: sympower/sympower-composite-actions/setup-build-environment@2024.06.11.15.00-651df41
+        uses: sympower/sympower-composite-actions/setup-build-environment@2024.07.08.18.37-bfed936
         with:
           secrets: ${{ env.secrets }}
       - id: format-version
         name: "Format version"
-        uses: sympower/sympower-composite-actions/format-version@2024.06.11.15.00-651df41
+        uses: sympower/sympower-composite-actions/format-version@2024.07.08.18.37-bfed936
         with:
           style-as-release: ${{ env.IS_DEFAULT_BRANCH }}
       - id: run-tests
         name: "Run tests"
-        uses: sympower/sympower-composite-actions/run-tests@2024.06.11.15.00-651df41
+        uses: sympower/sympower-composite-actions/run-tests@2024.07.08.18.37-bfed936
       - id: code-analysis
         name: "Code analysis"
-        uses: sympower/sympower-composite-actions/code-analysis@2024.06.11.15.00-651df41
+        uses: sympower/sympower-composite-actions/code-analysis@2024.07.08.18.37-bfed936
         with:
           secrets: ${{ env.secrets }}
 
@@ -45,7 +45,7 @@ jobs:
       - id: build-and-upload-docker-image
         name: "Build and upload Docker Image"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@2024.06.11.15.00-651df41
+        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@2024.07.08.18.37-bfed936
         with:
           version: ${{ steps.format-version.outputs.version }}
       - run: echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
@@ -64,7 +64,7 @@ jobs:
       - id: upload-schema
         name: "Upload schema"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-schema@2024.06.11.15.00-651df41
+        uses: sympower/sympower-composite-actions/upload-schema@2024.07.08.18.37-bfed936
         with:
           version: ${{ steps.format-version.outputs.version }}
           secrets: ${{ env.secrets }}
@@ -72,13 +72,13 @@ jobs:
       - id: upload-pacts
         name: "Upload pacts"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-pacts@2024.06.11.15.00-651df41
+        uses: sympower/sympower-composite-actions/upload-pacts@2024.07.08.18.37-bfed936
         with:
           version: ${{ steps.format-version.outputs.version }}
       - id: deploy-staging
         name: "Deploy staging"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/deploy-to-environment@2024.06.11.15.00-651df41
+        uses: sympower/sympower-composite-actions/deploy-to-environment@2024.07.08.18.37-bfed936
         with:
           secrets: ${{ env.secrets }}
           version: ${{ steps.format-version.outputs.version }}
@@ -88,4 +88,4 @@ jobs:
       - id: upload-build-artifacts
         name: "Upload build artifacts"
         if: always()
-        uses: sympower/sympower-composite-actions/upload-build-artifacts@2024.06.11.15.00-651df41
+        uses: sympower/sympower-composite-actions/upload-build-artifacts@2024.07.08.18.37-bfed936
