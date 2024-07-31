@@ -61,10 +61,10 @@ jobs:
           label: Service Version
           message: ${{ steps.format-version.outputs.version }}
           color: blue
-      - id: upload-schema
-        name: "Upload schema"
+      - id: upload-avro-schema
+        name: "Upload Avro schema"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-schema@2024.07.31.12.26-dd8f9fa
+        uses: sympower/sympower-composite-actions/upload-avro-schema@2024.07.31.12.26-dd8f9fa
         with:
           version: ${{ steps.format-version.outputs.version }}
           secrets: ${{ env.secrets }}
