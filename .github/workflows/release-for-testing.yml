@@ -4,6 +4,12 @@ name: Release for testing
 
 on:
   workflow_call:
+    inputs:
+      runner:
+        description: Runner to run the workflow
+        required: false
+        type: string
+        default: 'ubuntu-latest'
     outputs:
       version:
         description: Version number of the image released to ECR
@@ -11,7 +17,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     env:
       IS_DEFAULT_BRANCH: ${{ contains('refs/heads/main, refs/heads/master', github.ref) }}
       secrets: ${{ toJSON(secrets) }}
