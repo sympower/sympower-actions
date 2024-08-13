@@ -74,6 +74,13 @@ jobs:
           version: ${{ steps.format-version.outputs.version }}
           secrets: ${{ env.secrets }}
           gistID: ${{ inputs.gistID }}
+      - id: upload-openapi-schema
+        name: "Upload OpenAPI schema"
+        if: env.IS_DEFAULT_BRANCH == 'true'
+        uses: sympower/sympower-composite-actions/upload-openapi-schema@2024.07.31.12.26-dd8f9fa
+        with:
+          version: ${{ steps.format-version.outputs.version }}
+          secrets: ${{ env.secrets }}
       - id: upload-pacts
         name: "Upload pacts"
         if: env.IS_DEFAULT_BRANCH == 'true'
