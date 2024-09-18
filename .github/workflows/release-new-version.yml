@@ -81,6 +81,7 @@ jobs:
         with:
           version: ${{ steps.format-version.outputs.version }}
           secrets: ${{ env.secrets }}
+          gistID: ${{ inputs.gistID }}
       - id: upload-pacts
         name: "Upload pacts"
         if: env.IS_DEFAULT_BRANCH == 'true'
