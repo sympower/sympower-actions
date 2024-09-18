@@ -29,20 +29,20 @@ jobs:
     steps:
       - id: setup-build-environment
         name: "Setup build environment"
-        uses: sympower/sympower-composite-actions/setup-build-environment@2024.09.05.09.38-50358c1
+        uses: sympower/sympower-composite-actions/setup-build-environment@2024.09.18.07.54-55a189d
         with:
           secrets: ${{ env.secrets }}
       - id: format-version
         name: "Format version"
-        uses: sympower/sympower-composite-actions/format-version@2024.09.05.09.38-50358c1
+        uses: sympower/sympower-composite-actions/format-version@2024.09.18.07.54-55a189d
         with:
           style-as-release: ${{ env.IS_DEFAULT_BRANCH }}
       - id: run-tests
         name: "Run tests"
-        uses: sympower/sympower-composite-actions/run-tests@2024.09.05.09.38-50358c1
+        uses: sympower/sympower-composite-actions/run-tests@2024.09.18.07.54-55a189d
       - id: code-analysis
         name: "Code analysis"
-        uses: sympower/sympower-composite-actions/code-analysis@2024.09.05.09.38-50358c1
+        uses: sympower/sympower-composite-actions/code-analysis@2024.09.18.07.54-55a189d
         with:
           secrets: ${{ env.secrets }}
 
@@ -50,7 +50,7 @@ jobs:
       - id: build-and-upload-docker-image
         name: "Build and upload Docker Image"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@2024.09.05.09.38-50358c1
+        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@2024.09.18.07.54-55a189d
         with:
           version: ${{ steps.format-version.outputs.version }}
       - run: echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
@@ -69,7 +69,7 @@ jobs:
       - id: upload-avro-schema
         name: "Upload Avro schema"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-avro-schema@2024.09.05.09.38-50358c1
+        uses: sympower/sympower-composite-actions/upload-avro-schema@2024.09.18.07.54-55a189d
         with:
           version: ${{ steps.format-version.outputs.version }}
           secrets: ${{ env.secrets }}
@@ -77,20 +77,20 @@ jobs:
       - id: upload-openapi-schema
         name: "Upload OpenAPI schema"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-openapi-schema@2024.09.05.09.38-50358c1
+        uses: sympower/sympower-composite-actions/upload-openapi-schema@2024.09.18.07.54-55a189d
         with:
           version: ${{ steps.format-version.outputs.version }}
           secrets: ${{ env.secrets }}
       - id: upload-pacts
         name: "Upload pacts"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-pacts@2024.09.05.09.38-50358c1
+        uses: sympower/sympower-composite-actions/upload-pacts@2024.09.18.07.54-55a189d
         with:
           version: ${{ steps.format-version.outputs.version }}
       - id: deploy-staging
         name: "Deploy staging"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/deploy-to-environment@2024.09.05.09.38-50358c1
+        uses: sympower/sympower-composite-actions/deploy-to-environment@2024.09.18.07.54-55a189d
         with:
           secrets: ${{ env.secrets }}
           version: ${{ steps.format-version.outputs.version }}
@@ -100,4 +100,4 @@ jobs:
       - id: upload-build-artifacts
         name: "Upload build artifacts"
         if: always()
-        uses: sympower/sympower-composite-actions/upload-build-artifacts@2024.09.05.09.38-50358c1
+        uses: sympower/sympower-composite-actions/upload-build-artifacts@2024.09.18.07.54-55a189d
