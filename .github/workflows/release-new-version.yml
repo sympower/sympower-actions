@@ -13,6 +13,11 @@ on:
         required: false
         type: string
         default: 'ubuntu-latest'
+      additional-gradle-args:
+        description: 'Additional arguments to pass to the Gradle commands'
+        required: false
+        type: string
+        default: ""
     outputs:
       version:
         description: Version number of the image released to ECR
@@ -29,30 +34,34 @@ jobs:
     steps:
       - id: setup-build-environment
         name: "Setup build environment"
-        uses: sympower/sympower-composite-actions/setup-build-environment@2024.10.07.10.09-c42a2ac
+        uses: sympower/sympower-composite-actions/setup-build-environment@2024.10.30.15.01-8580c69
         with:
           secrets: ${{ env.secrets }}
       - id: format-version
         name: "Format version"
-        uses: sympower/sympower-composite-actions/format-version@2024.10.07.10.09-c42a2ac
+        uses: sympower/sympower-composite-actions/format-version@2024.10.30.15.01-8580c69
         with:
           style-as-release: ${{ env.IS_DEFAULT_BRANCH }}
       - id: run-tests
         name: "Run tests"
-        uses: sympower/sympower-composite-actions/run-tests@2024.10.07.10.09-c42a2ac
+        uses: sympower/sympower-composite-actions/run-tests@2024.10.30.15.01-8580c69
+        with:
+          additional-gradle-args: ${{ inputs.additional-gradle-args }}
       - id: code-analysis
         name: "Code analysis"
-        uses: sympower/sympower-composite-actions/code-analysis@2024.10.07.10.09-c42a2ac
+        uses: sympower/sympower-composite-actions/code-analysis@2024.10.30.15.01-8580c69
         with:
           secrets: ${{ env.secrets }}
+          additional-gradle-args: ${{ inputs.additional-gradle-args }}
 
       ### Steps run only in default branch ###
       - id: build-and-upload-docker-image
         name: "Build and upload Docker Image"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@2024.10.07.10.09-c42a2ac
+        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@2024.10.30.15.01-8580c69
         with:
           version: ${{ steps.format-version.outputs.version }}
+          additional-gradle-args: ${{ inputs.additional-gradle-args }}
       - run: echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
         if: env.IS_DEFAULT_BRANCH == 'true'
         shell: bash
@@ -69,29 +78,31 @@ jobs:
       - id: upload-avro-schema
         name: "Upload Avro schema"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-avro-schema@2024.10.07.10.09-c42a2ac
+        uses: sympower/sympower-composite-actions/upload-avro-schema@2024.10.30.15.01-8580c69
         with:
           version: ${{ steps.format-version.outputs.version }}
           secrets: ${{ env.secrets }}
           gistID: ${{ inputs.gistID }}
+          additional-gradle-args: ${{ inputs.additional-gradle-args }}
       - id: upload-openapi-schema
         name: "Upload OpenAPI schema"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-openapi-schema@2024.10.07.10.09-c42a2ac
+        uses: sympower/sympower-composite-actions/upload-openapi-schema@2024.10.30.15.01-8580c69
         with:
           version: ${{ steps.format-version.outputs.version }}
           secrets: ${{ env.secrets }}
           gistID: ${{ inputs.gistID }}
+          additional-gradle-args: ${{ inputs.additional-gradle-args }}
       - id: upload-pacts
         name: "Upload pacts"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-pacts@2024.10.07.10.09-c42a2ac
+        uses: sympower/sympower-composite-actions/upload-pacts@2024.10.30.15.01-8580c69
         with:
           version: ${{ steps.format-version.outputs.version }}
       - id: deploy-staging
         name: "Deploy staging"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/deploy-to-environment@2024.10.07.10.09-c42a2ac
+        uses: sympower/sympower-composite-actions/deploy-to-environment@2024.10.30.15.01-8580c69
         with:
           secrets: ${{ env.secrets }}
           version: ${{ steps.format-version.outputs.version }}
@@ -101,4 +112,4 @@ jobs:
       - id: upload-build-artifacts
         name: "Upload build artifacts"
         if: always()
-        uses: sympower/sympower-composite-actions/upload-build-artifacts@2024.10.07.10.09-c42a2ac
+        uses: sympower/sympower-composite-actions/upload-build-artifacts@2024.10.30.15.01-8580c69
