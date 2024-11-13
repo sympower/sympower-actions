@@ -18,6 +18,11 @@ on:
         required: false
         type: string
         default: ""
+      require-review-when-deploying-to-production:
+        description: 'Whether auto-deploy to production should require a manual PR approval'
+        required: false
+        type: boolean
+        default: true
     outputs:
       version:
         description: Version number of the image released to ECR
@@ -107,6 +112,16 @@ jobs:
           secrets: ${{ env.secrets }}
           version: ${{ steps.format-version.outputs.version }}
           deploy-group: staging
+          require-review: false
+      - id: deploy-production
+        name: "Deploy production"
+        if: env.IS_DEFAULT_BRANCH == 'true'
+        uses: sympower/sympower-composite-actions/deploy-to-environment@2024.10.30.15.01-8580c69
+        with:
+          secrets: ${{ env.secrets }}
+          version: ${{ steps.format-version.outputs.version }}
+          deploy-group: platform
+          require-review: ${{ inputs.require-review-when-deploying-to-production }}
       ### End of steps run only in default branch ###
 
       - id: upload-build-artifacts
