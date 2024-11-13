@@ -18,8 +18,8 @@ on:
         required: false
         type: string
         default: ""
-      require-review-when-deploying-to-production:
-        description: 'Whether auto-deploy to production should require a manual PR approval'
+      require-approval-when-deploying-to-production:
+        description: 'Whether auto-deploy to production should require a manual approval'
         required: false
         type: boolean
         default: true
@@ -112,7 +112,7 @@ jobs:
           secrets: ${{ env.secrets }}
           version: ${{ steps.format-version.outputs.version }}
           deploy-group: staging
-          require-review: false
+          require-approval: false
       - id: deploy-production
         name: "Deploy production"
         if: env.IS_DEFAULT_BRANCH == 'true'
@@ -121,7 +121,7 @@ jobs:
           secrets: ${{ env.secrets }}
           version: ${{ steps.format-version.outputs.version }}
           deploy-group: platform
-          require-review: ${{ inputs.require-review-when-deploying-to-production }}
+          require-approval: ${{ inputs.require-approval-when-deploying-to-production }}
       ### End of steps run only in default branch ###
 
       - id: upload-build-artifacts
