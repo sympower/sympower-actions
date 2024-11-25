@@ -36,7 +36,7 @@ jobs:
           secrets: ${{ env.secrets }}
       - id: format-version
         name: "Format version"
-        uses: sympower/sympower-composite-actions/format-version@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/format-version@unique-versions-for-test-images
         with:
           style-as-release: ${{ env.IS_DEFAULT_BRANCH }}
       - id: build-and-upload-docker-image
@@ -49,3 +49,11 @@ jobs:
         name: "Upload build artifacts"
         if: always()
         uses: sympower/sympower-composite-actions/upload-build-artifacts@2024.11.15.11.12-d7db6c0
+      - id: deploy-staging
+        name: "Deploy to testing environment"
+        uses: sympower/sympower-composite-actions/deploy-to-environment@2024.11.15.11.12-d7db6c0
+        with:
+          secrets: ${{ env.secrets }}
+          version: ${{ steps.format-version.outputs.version }}
+          deploy-group: testing
+          require-approval: false
