@@ -88,6 +88,17 @@ jobs:
 schema artifact and Docker image without checking if the branch is main/master or not. This workflow is meant to be used
 for manually publishing testing images and schemas.
 
+If you have added [auto-deployment JSON](https://github.com/sympower/sympower-composite-actions/blob/main/README.md#deploy-to-environment)
+with `testing` deployment group then this workflow will auto-deploy the created image to the desired environment. 
+For example following `auto-deploy/testing.env.json` file would deploy the image created to `my-test-env` environment:
+
+```json
+{
+  "environment": "my-test-env",
+  "deployGroup": "testing"
+}
+```
+
 This workflow calls following composite actions:
 * [setup-build-environment](https://github.com/sympower/sympower-composite-actions/blob/main/README.md#setup-build-environment)
 * [format-version](https://github.com/sympower/sympower-composite-actions/blob/main/README.md#format-version)

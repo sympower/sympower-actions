@@ -31,27 +31,27 @@ jobs:
     steps:
       - id: setup-build-environment
         name: "Setup build environment"
-        uses: sympower/sympower-composite-actions/setup-build-environment@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/setup-build-environment@2024.12.05.16.28-2d0b46c
         with:
           secrets: ${{ env.secrets }}
       - id: format-version
         name: "Format version"
-        uses: sympower/sympower-composite-actions/format-version@unique-versions-for-test-images
+        uses: sympower/sympower-composite-actions/format-version@2024.12.05.16.28-2d0b46c
         with:
           style-as-release: ${{ env.IS_DEFAULT_BRANCH }}
       - id: build-and-upload-docker-image
         name: "Build and upload Docker Image"
-        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@2024.12.05.16.28-2d0b46c
         with:
           version: ${{ steps.format-version.outputs.version }}
           additional-gradle-args: ${{ inputs.additional-gradle-args }}
       - id: upload-build-artifacts
         name: "Upload build artifacts"
         if: always()
-        uses: sympower/sympower-composite-actions/upload-build-artifacts@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/upload-build-artifacts@2024.12.05.16.28-2d0b46c
       - id: deploy-staging
         name: "Deploy to testing environment"
-        uses: sympower/sympower-composite-actions/deploy-to-environment@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/deploy-to-environment@2024.12.05.16.28-2d0b46c
         with:
           secrets: ${{ env.secrets }}
           version: ${{ steps.format-version.outputs.version }}
