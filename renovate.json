@@ -8,7 +8,7 @@
   ],
   "packageRules": [
     {
-      "matchPackagePrefixes": ["sympower/sympower-composite-actions"],
+      "matchPackagePrefixes": ["sympower/sympower-composite-actions{/,}**"],
       "versioning": "loose",
       "automerge": true,
       "automergeType": "branch"
