@@ -39,22 +39,22 @@ jobs:
     steps:
       - id: setup-build-environment
         name: "Setup build environment"
-        uses: sympower/sympower-composite-actions/setup-build-environment@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/setup-build-environment@2024.12.05.16.28-2d0b46c
         with:
           secrets: ${{ env.secrets }}
       - id: format-version
         name: "Format version"
-        uses: sympower/sympower-composite-actions/format-version@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/format-version@2024.12.05.16.28-2d0b46c
         with:
           style-as-release: ${{ env.IS_DEFAULT_BRANCH }}
       - id: run-tests
         name: "Run tests"
-        uses: sympower/sympower-composite-actions/run-tests@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/run-tests@2024.12.05.16.28-2d0b46c
         with:
           additional-gradle-args: ${{ inputs.additional-gradle-args }}
       - id: code-analysis
         name: "Code analysis"
-        uses: sympower/sympower-composite-actions/code-analysis@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/code-analysis@2024.12.05.16.28-2d0b46c
         with:
           secrets: ${{ env.secrets }}
           additional-gradle-args: ${{ inputs.additional-gradle-args }}
@@ -63,7 +63,7 @@ jobs:
       - id: build-and-upload-docker-image
         name: "Build and upload Docker Image"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/build-and-upload-docker-image@2024.12.05.16.28-2d0b46c
         with:
           version: ${{ steps.format-version.outputs.version }}
           additional-gradle-args: ${{ inputs.additional-gradle-args }}
@@ -83,7 +83,7 @@ jobs:
       - id: upload-avro-schema
         name: "Upload Avro schema"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-avro-schema@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/upload-avro-schema@2024.12.05.16.28-2d0b46c
         with:
           version: ${{ steps.format-version.outputs.version }}
           secrets: ${{ env.secrets }}
@@ -92,7 +92,7 @@ jobs:
       - id: upload-openapi-schema
         name: "Upload OpenAPI schema"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-openapi-schema@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/upload-openapi-schema@2024.12.05.16.28-2d0b46c
         with:
           version: ${{ steps.format-version.outputs.version }}
           secrets: ${{ env.secrets }}
@@ -101,13 +101,13 @@ jobs:
       - id: upload-pacts
         name: "Upload pacts"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/upload-pacts@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/upload-pacts@2024.12.05.16.28-2d0b46c
         with:
           version: ${{ steps.format-version.outputs.version }}
       - id: deploy-staging
         name: "Deploy staging"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/deploy-to-environment@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/deploy-to-environment@2024.12.05.16.28-2d0b46c
         with:
           secrets: ${{ env.secrets }}
           version: ${{ steps.format-version.outputs.version }}
@@ -116,7 +116,7 @@ jobs:
       - id: deploy-production
         name: "Deploy production"
         if: env.IS_DEFAULT_BRANCH == 'true'
-        uses: sympower/sympower-composite-actions/deploy-to-environment@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/deploy-to-environment@2024.12.05.16.28-2d0b46c
         with:
           secrets: ${{ env.secrets }}
           version: ${{ steps.format-version.outputs.version }}
@@ -127,4 +127,4 @@ jobs:
       - id: upload-build-artifacts
         name: "Upload build artifacts"
         if: always()
-        uses: sympower/sympower-composite-actions/upload-build-artifacts@2024.11.15.11.12-d7db6c0
+        uses: sympower/sympower-composite-actions/upload-build-artifacts@2024.12.05.16.28-2d0b46c
