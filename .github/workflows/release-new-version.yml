@@ -21,10 +21,12 @@ on:
       skip-behaviour-tests:
         description: 'Skip running behaviour tests'
         required: false
+        type: string
         default: "false"
       skip-integration-tests:
         description: 'Skip running integration tests'
         required: false
+        type: string
         default: "false"
       require-approval-when-deploying-to-production:
         description: 'Whether auto-deploy to production should require a manual approval'
