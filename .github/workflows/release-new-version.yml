@@ -18,6 +18,14 @@ on:
         required: false
         type: string
         default: ""
+      skip-behaviour-tests:
+        description: 'Skip running behaviour tests'
+        required: false
+        default: "false"
+      skip-integration-tests:
+        description: 'Skip running integration tests'
+        required: false
+        default: "false"
       require-approval-when-deploying-to-production:
         description: 'Whether auto-deploy to production should require a manual approval'
         required: false
@@ -49,9 +57,11 @@ jobs:
           style-as-release: ${{ env.IS_DEFAULT_BRANCH }}
       - id: run-tests
         name: "Run tests"
-        uses: sympower/sympower-composite-actions/run-tests@2024.12.06.12.10-09ea7ed
+        uses: sympower/sympower-composite-actions/run-tests@2025.01.16.13.42-fdbbcd1
         with:
           additional-gradle-args: ${{ inputs.additional-gradle-args }}
+          skip-behaviour-tests: ${{ inputs.skip-behaviour-tests }}
+          skip-integration-tests: ${{ inputs.skip-integration-tests }}
       - id: code-analysis
         name: "Code analysis"
         uses: sympower/sympower-composite-actions/code-analysis@2024.12.06.12.10-09ea7ed
